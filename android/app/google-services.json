@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "23963148123",
+    "project_id": "bbarna-6a725",
+    "storage_bucket": "bbarna-6a725.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:23963148123:android:c46d2b755efea0b0cc847e",
+        "android_client_info": {
+          "package_name": "com.amaresh.b_barna_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8zLIU0oXqZTIa-rQQ10LnK3V8bcEU9bU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
