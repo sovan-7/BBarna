@@ -1,4 +1,4 @@
-package com.amaresh.b_barna_app // ✅ Make sure this matches your app’s package name
+package com.bbarna.b_barna_app // ✅ Make sure this matches your app’s package name
 
 import android.os.Bundle
 import android.view.WindowManager

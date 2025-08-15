@@ -7,9 +7,28 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:23963148123:android:c46d2b755efea0b0cc847e",
+        "mobilesdk_app_id": "1:23963148123:android:6dc7701226ae5bfdcc847e",
         "android_client_info": {
-          "package_name": "com.amaresh.b_barna_app"
+          "package_name": "com.bbarna.b_barna_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8zLIU0oXqZTIa-rQQ10LnK3V8bcEU9bU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:23963148123:android:4bb4712f0860f8cbcc847e",
+        "android_client_info": {
+          "package_name": "com.technolancers.bbarna"
         }
       },
       "oauth_client": [],

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.amaresh.b_barna_app">
+    package="com.bbarna.b_barna_app">
 
     <!-- Override Firebase Firestore's minSdk requirement -->
     <uses-sdk tools:overrideLibrary="com.google.firebase.firestore" />
