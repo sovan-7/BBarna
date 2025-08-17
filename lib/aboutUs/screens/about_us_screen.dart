@@ -48,7 +48,7 @@ class _AboutUsScreenState extends State<AboutUsScreen> {
                         onTap: () async {
                           try {
                             await launchUrl(Uri.parse(
-                                "https://b-barna-website.vercel.app/"));
+                                "https://www.bbarna.in/"));
                           } catch (e) {
                             Helper.showSnackBarMessage(
                                 msg: "Sorry something went wrong",
