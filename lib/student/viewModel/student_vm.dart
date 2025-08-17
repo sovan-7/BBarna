@@ -30,4 +30,8 @@ class StudentViewModel with ChangeNotifier {
       await setCurrentStudentData();
     });
   }
+
+  Future deleteStudent() async {
+    await _studentRepo.deleteStudent();
+  }
 }

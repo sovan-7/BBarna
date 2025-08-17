@@ -21,7 +21,8 @@ class EditProfileScreen extends StatelessWidget {
       "Privacy Policy",
       "About Us",
       "Share",
-      "Logout"
+      "Logout",
+      "Delete Account"
     ];
     List<IconData> iconList = [
       Icons.done_all_outlined,
@@ -30,6 +31,7 @@ class EditProfileScreen extends StatelessWidget {
       Icons.event_available_outlined,
       Icons.share,
       Icons.logout,
+      Icons.delete
     ];
     return SafeArea(
         child: Scaffold(

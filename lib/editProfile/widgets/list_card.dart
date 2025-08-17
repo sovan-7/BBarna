@@ -1,10 +1,13 @@
 // ignore_for_file: must_be_immutable
 
+import 'package:b_barna_app/core/widgets/delete_account.dart';
+import 'package:b_barna_app/student/viewModel/student_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:b_barna_app/core/route/route_name.dart';
 import 'package:b_barna_app/core/widgets/logout_dialog.dart';
 import 'package:b_barna_app/enrolledCourses/screens/enrolled_course_list.dart';
 import 'package:b_barna_app/textSize/text_view_normal.dart';
+import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 
 class ListCard extends StatefulWidget {
@@ -42,15 +45,27 @@ class _ListCardState extends State<ListCard> {
           Navigator.pushNamed(context, RouteName.privacyPolicyScreenRoute);
         } else if (widget.index == 3) {
           Navigator.pushNamed(context, RouteName.aboutUsScreenRoute);
+        } else if (widget.index == 4) {
+          Share.share('check out my website https://flutter.dev',
+              subject: 'Look what I made!');
         } else if (widget.index == 5) {
           showDialog(
               context: context,
               builder: (BuildContext context) {
                 return const LogoutDialog();
               });
-        } else if (widget.index == 4) {
-          Share.share('check out my website https://flutter.dev',
-              subject: 'Look what I made!');
+        } else if (widget.index == 6) {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return DeleteAccount(
+                  onSubmit: () {
+                    Navigator.pop(context);
+                    Provider.of<StudentViewModel>(context, listen: false)
+                        .deleteStudent();
+                  },
+                );
+              });
         }
       },
       child: Container(

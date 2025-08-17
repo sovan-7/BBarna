@@ -1,11 +1,14 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:b_barna_app/core/route/route_name.dart';
+import 'package:b_barna_app/utils/helper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:b_barna_app/core/constants/value_constants.dart';
 import 'package:b_barna_app/student/model/student_model.dart';
 import 'package:b_barna_app/utils/sp_keys.dart';
+import 'package:flutter/material.dart';
 
 class StudentRepo {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -64,6 +67,24 @@ class StudentRepo {
           .update({"student_image": imageUrl});
     } catch (e) {
       log(e.toString());
+    }
+  }
+
+  Future deleteStudent() async {
+    try {
+      await _firestore
+          .collection(student)
+          .doc(sp?.getStringFromPref(SPKeys.studentId))
+          .delete()
+          .then((val) {
+        Navigator.popAndPushNamed(
+            navigatorKey.currentContext!, RouteName.loginScreenRoute);
+        Helper.showSnackBarMessage(
+            msg: "Account deleted successfully", isSuccess: false);
+      });
+    } catch (e) {
+      Helper.showSnackBarMessage(
+          msg: "Sorry something went wrong", isSuccess: false);
     }
   }
 }
