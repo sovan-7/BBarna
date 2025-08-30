@@ -111,7 +111,7 @@ class ReportQuestionDialog extends StatelessWidget {
 
   Future<void> shareToWhatsAppNumber(String message) async {
     final url = Uri.parse(
-        "https://wa.me/918509378398?text=${Uri.encodeComponent(message)}");
+        "https://wa.me/7001739646?text=${Uri.encodeComponent(message)}");
 
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
