@@ -20,7 +20,11 @@ class _ScoreBoardScreenState extends State<ScoreBoardScreen> {
   void initState() {
     ScoreViewModel scoreViewModel =
         Provider.of<ScoreViewModel>(context, listen: false);
-    scoreViewModel.getQuizResult(widget.quizCode);
+    if (scoreViewModel.quizModel == null ||
+        (scoreViewModel.quizModel != null &&
+            scoreViewModel.quizModel?.quizCode != widget.quizCode)) {
+      scoreViewModel.getQuizResult(widget.quizCode);
+    }
     scoreViewModel.getTopperList(widget.quizCode);
     super.initState();
   }

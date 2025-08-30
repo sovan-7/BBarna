@@ -14,7 +14,8 @@ class DeleteAccount extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.0),
       ),
       alignment: Alignment.center,
-      backgroundColor:const Color(0xFF09636E),
+      backgroundColor:Colors.white,
+      //const Color(0xFF09636E),
       //Colors.lightBlue,
       actionsAlignment: MainAxisAlignment.end,
       title: TextViewBold(

@@ -1,3 +1,7 @@
+import 'package:b_barna_app/core/constants/value_constants.dart';
+import 'package:b_barna_app/core/widgets/loader_dialog.dart';
+import 'package:b_barna_app/scoreBoard/viewmodel/score_viewmodel.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:b_barna_app/core/route/route_name.dart';
 import 'package:b_barna_app/core/widgets/app_header.dart';
@@ -76,12 +80,48 @@ class _QuizScreenState extends State<QuizScreen> {
                               if (quizDataProvider
                                       .quizList[index].totalQuestion !=
                                   0) {
-                                Navigator.pushNamed(
-                                    context, RouteName.questionPaperScreenRoute,
-                                    arguments: {
-                                      "quizModel":
-                                          quizDataProvider.quizList[index]
-                                    });
+                                ScoreViewModel scoreViewModel =
+                                    Provider.of<ScoreViewModel>(context,
+                                        listen: false);
+                                LoaderDialog.show(context);
+                                try {
+                                  scoreViewModel.clearQuiz();
+                                  scoreViewModel
+                                      .getQuizResult(
+                                          quizDataProvider.quizList[index].code)
+                                      .then((val) {
+                                    Timestamp now = Timestamp.now();
+                                    bool result = true;
+                                    if (scoreViewModel.quizModel?.timeStamp !=
+                                        intDefault) {
+                                      result = isMoreThan24Hours(
+                                          now,
+                                          intToTimestamp(scoreViewModel
+                                                  .quizModel?.timeStamp ??
+                                              intDefault));
+                                    }
+                                    Navigator.pop(context);
+
+                                    if (result) {
+                                      Navigator.pushNamed(context,
+                                          RouteName.questionPaperScreenRoute,
+                                          arguments: {
+                                            "quizModel":
+                                                quizDataProvider.quizList[index]
+                                          });
+                                    } else {
+                                      Navigator.pushNamed(
+                                          navigatorKey.currentContext!,
+                                          RouteName.scoreBoardScreenRoute,
+                                          arguments: {
+                                            "quizCode": quizDataProvider
+                                                .quizList[index].code
+                                          });
+                                    }
+                                  });
+                                } catch (e) {
+                                  Navigator.pop(context);
+                                }
                               } else {
                                 Helper.showSnackBarMessage(
                                     msg:
@@ -134,5 +174,16 @@ class _QuizScreenState extends State<QuizScreen> {
       time = "$quizTime Minute";
     }
     return time;
+  }
+
+  bool isMoreThan24Hours(Timestamp t1, Timestamp t2) {
+    DateTime d1 = t1.toDate();
+    DateTime d2 = t2.toDate();
+    Duration difference = d1.difference(d2).abs();
+    return difference.inHours >= 24;
+  }
+
+  Timestamp intToTimestamp(int milliSecond) {
+    return Timestamp.fromMillisecondsSinceEpoch(milliSecond);
   }
 }

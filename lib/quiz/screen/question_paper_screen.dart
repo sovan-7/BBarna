@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_html_table/flutter_html_table.dart';
@@ -573,4 +574,10 @@ class _QuestionPaperScreenState extends State<QuestionPaperScreen> {
     final String parsedString = document.body?.text ?? '';
     return parsedString;
   }
+  bool isMoreThan24Hours(Timestamp t1, Timestamp t2) {
+  DateTime d1 = t1.toDate();
+  DateTime d2 = t2.toDate();
+  Duration difference = d1.difference(d2).abs();
+  return difference.inHours > 24;
+}
 }

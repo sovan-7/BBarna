@@ -35,7 +35,7 @@ class ScoreViewModel extends ChangeNotifier {
           docData["quiz_code"],
           docData["quiz_name"],
           docData["attempt_count"] ?? intDefault,
-          docData["timeStamp"] ?? intDefault,
+          docData["time_stamp"] ?? intDefault,
           docData["time_taken"] ?? intDefault,
           docData["correct_answered"] ?? intDefault,
           docData["un_answered"] ?? intDefault,
@@ -88,10 +88,10 @@ class ScoreViewModel extends ChangeNotifier {
                     docData['question_list']
                         .map((question) => QuestionModel.fromMap(question)),
                   )));
-        WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-          notifyListeners();
-        });
       }
+     // WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        notifyListeners();
+     // });
     } catch (e) {
       log(e.toString());
       return null;

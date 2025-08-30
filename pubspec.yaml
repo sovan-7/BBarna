@@ -71,6 +71,7 @@ dependencies:
   url_launcher: ^6.1.10
   intl: ^0.20.2
   flutter_html_table: ^3.0.0
+  flutter_spinkit: ^5.2.2
 
 dev_dependencies:
   flutter_test:

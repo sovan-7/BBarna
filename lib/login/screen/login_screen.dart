@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:b_barna_app/core/widgets/loader_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -115,6 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         if (phoneController.text.length == 10 &&
                             nameController.text.trim().isNotEmpty) {
                           try {
+                            LoaderDialog.show(context);
                             CollectionReference collectionReference =
                                 fireStore.collection(student);
                             QuerySnapshot querySnapshot =
@@ -136,6 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     SPKeys.name, nameController.text);
                                 sp!.setStringToPref(
                                     SPKeys.phoneNumber, phoneController.text);
+                                LoaderDialog.hide(context);
                                 Navigator.pushNamedAndRemoveUntil(
                                     context,
                                     RouteName.bottomNavBarScreenRoute,
@@ -159,17 +162,20 @@ class _LoginScreenState extends State<LoginScreen> {
                                     SPKeys.name, nameController.text);
                                 sp!.setStringToPref(
                                     SPKeys.phoneNumber, phoneController.text);
+                                    LoaderDialog.hide(context);
                                 Navigator.pushNamedAndRemoveUntil(
                                     context,
                                     RouteName.bottomNavBarScreenRoute,
                                     (route) => false);
                               });
                             } else {
+                              LoaderDialog.hide(context);
                               Helper.showSnackBarMessage(
                                   msg: "You have logged in on other device",
                                   isSuccess: false);
                             }
                           } catch (e) {
+                            LoaderDialog.hide(context);
                             log(e.toString());
                             Helper.showSnackBarMessage(
                                 msg: "Sorry something went wrong",
