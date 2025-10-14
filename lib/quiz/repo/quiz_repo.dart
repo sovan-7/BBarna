@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:b_barna_app/quiz/model/quiz_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:b_barna_app/core/constants/value_constants.dart';
@@ -62,6 +63,21 @@ class QuizRepo {
       log(e.toString());
       Helper.showSnackBarMessage(
           msg: "Sorry something went wrong", isSuccess: false);
+      return null;
+    }
+  }
+
+  Future fetchFreeQuizList() async {
+    try {
+      QuerySnapshot<Map<String, dynamic>> snapshot = await _fireStore
+          .collection(quiz)
+          .where("quiz_type", isEqualTo: "FREE")
+          .get();
+      return snapshot.docs
+          .map((docSnapshot) => QuizModel.fromMap(docSnapshot.data()))
+          .toList();
+    } catch (e) {
+      log(e.toString());
       return null;
     }
   }

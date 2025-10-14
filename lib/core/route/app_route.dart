@@ -1,3 +1,6 @@
+import 'package:b_barna_app/pdf/screen/free_pdf.dart';
+import 'package:b_barna_app/quiz/screen/free_quiz.dart';
+import 'package:b_barna_app/video/screen/free_video_list.dart';
 import 'package:flutter/material.dart';
 import 'package:b_barna_app/aboutUs/screens/about_us_screen.dart';
 import 'package:b_barna_app/privacyPolicy/privacy_policy.dart';
@@ -83,6 +86,18 @@ class AppRouter {
           return QuizScreen(
             quizCodeList: args["quizCodeList"],
           );
+        });
+      case RouteName.freeQuizScreenRoute:
+        return MaterialPageRoute(builder: (_) {
+          return FreeQuizScreen();
+        });
+        case RouteName.freePdfScreenRoute:
+        return MaterialPageRoute(builder: (_) {
+          return FreePdfList();
+        });
+        case RouteName.freeVideoScreenRoute:
+        return MaterialPageRoute(builder: (_) {
+          return FreeVideoList();
         });
       case RouteName.pdfList:
         return MaterialPageRoute(builder: (_) {

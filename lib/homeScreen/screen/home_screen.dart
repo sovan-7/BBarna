@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:b_barna_app/enrolledCourses/screens/enrolled_course_list.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -35,10 +36,10 @@ class _HomeScreenState extends State<HomeScreen> {
   ];
   List<String> subIconHeading = [
     "Paid Course",
-    "Books",
-    "Paid Test",
-    "Free Course",
-    "Free Test",
+    "Enrolled Course",
+    "Free Video",
+    "Free Note",
+    "Free Quiz",
     "Current Affairs"
   ];
   late Razorpay razorpay = Razorpay();
@@ -108,11 +109,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   Padding(
                     padding: EdgeInsets.only(left: 15.0),
                     child: InkWell(
-                    onTap: () {
-                      Helper.showSnackBarMessage(
-                          msg: "Coming soon", isSuccess: false);
-                    },
-                    child: Icon(
+                      onTap: () {
+                        Helper.showSnackBarMessage(
+                            msg: "Coming soon", isSuccess: false);
+                      },
+                      child: Icon(
                         Icons.notifications,
                         size: 25,
                         color: Colors.white,
@@ -177,8 +178,38 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: List.generate(6, (index) {
                         return InkWell(
                           onTap: () {
-                            Helper.showSnackBarMessage(
-                                msg: "Coming soon", isSuccess: false);
+                            switch (index) {
+                              case 0:
+                                Navigator.pushNamed(
+                                    context, RouteName.courseList);
+                                break;
+                              case 1:
+                                showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return const Dialog(
+                                          insetPadding: EdgeInsets.all(0),
+                                          backgroundColor: Colors.transparent,
+                                          child: EnrolledCourseList());
+                                    });
+                                break;
+                              case 2:
+                                Navigator.pushNamed(
+                                    context, RouteName.freeVideoScreenRoute);
+                                break;
+                              case 3:
+                                Navigator.pushNamed(
+                                    context, RouteName.freePdfScreenRoute);
+                                break;
+                              case 4:
+                                Navigator.pushNamed(
+                                    context, RouteName.freeQuizScreenRoute);
+                                break;
+                              case 5:
+                                Helper.showSnackBarMessage(
+                                    msg: "Coming soon", isSuccess: false);
+                                break;
+                            }
                           },
                           child: Container(
                             margin: const EdgeInsets.all(8),

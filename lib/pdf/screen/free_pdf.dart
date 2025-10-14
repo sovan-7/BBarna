@@ -9,24 +9,21 @@ import 'package:b_barna_app/pdf/screen/pdf_viewer_page.dart';
 import 'package:b_barna_app/pdf/viewModel/pdf_viewmodel.dart';
 import 'package:provider/provider.dart';
 
-class PdfList extends StatefulWidget {
-  List<String> pdfCodeList = [];
-  PdfList({required this.pdfCodeList, super.key});
-
+class FreePdfList extends StatefulWidget {
+  FreePdfList({super.key});
   @override
-  State<PdfList> createState() => _PdfListState();
+  State<FreePdfList> createState() => _PdfListState();
 }
 
-class _PdfListState extends State<PdfList> {
+class _PdfListState extends State<FreePdfList> {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
   @override
   void initState() {
     PdfViewModel pdfViewModel =
         Provider.of<PdfViewModel>(context, listen: false);
-
     pdfViewModel.clearPdfList();
-    pdfViewModel.fetchPdfList(widget.pdfCodeList);
+    pdfViewModel.fetchFreePdfList();
     initializeNotifications();
     super.initState();
   }
@@ -122,7 +119,7 @@ class _PdfListState extends State<PdfList> {
                             right: 10,
                             child: InkWell(
                               onTap: () async {
-                               // printPdf( pdfDataProvider.pdfList[index].pdfLink);
+                                // printPdf( pdfDataProvider.pdfList[index].pdfLink);
                                 startDownload(
                                     pdfDataProvider.pdfList[index].pdfLink);
                               },

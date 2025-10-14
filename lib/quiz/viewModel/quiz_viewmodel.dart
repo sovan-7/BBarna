@@ -26,6 +26,8 @@ class QuizViewModel extends ChangeNotifier {
   String quizCode = stringDefault;
   String quizName = stringDefault;
   bool isSubmitted = false;
+  List<QuestionModel> freeQuizList = [];
+
   clearQuizList() {
     quizList.clear();
   }
@@ -268,5 +270,10 @@ class QuizViewModel extends ChangeNotifier {
       remainingTime = "$remaining Second";
     }
     return remainingTime;
+  }
+
+  Future fetchFreeQuizList() async {
+    freeQuizList = await quizRepo.fetchFreeQuizList();
+    notifyListeners();
   }
 }

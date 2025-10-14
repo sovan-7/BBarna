@@ -6,14 +6,14 @@ import 'package:b_barna_app/video/model/video_model.dart';
 
 class VideoViewModel extends ChangeNotifier {
   List<VideoModel> videoList = [];
+  List<VideoModel> freeVideoList = [];
+
   clearVideoList() {
     videoList.clear();
+    freeVideoList.clear();
   }
 
   Future fetchVideoList(List<String> videoCodeList) async {
-    for (int i = 0; i < videoCodeList.length; i++) {
-      print(videoCodeList[i]);
-    }
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection(video)
@@ -23,6 +23,23 @@ class VideoViewModel extends ChangeNotifier {
         DocumentSnapshot<Map<String, dynamic>> docData =
             querySnapshot.docs[i] as DocumentSnapshot<Map<String, dynamic>>;
         videoList.add(VideoModel.fromDocumentSnapshot(docData));
+      }
+      notifyListeners();
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  Future fetchFreeVideoList() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection(video)
+          .where("video_type", isEqualTo: "FREE")
+          .get();
+      for (int i = 0; i < querySnapshot.docs.length; i++) {
+        DocumentSnapshot<Map<String, dynamic>> docData =
+            querySnapshot.docs[i] as DocumentSnapshot<Map<String, dynamic>>;
+        freeVideoList.add(VideoModel.fromDocumentSnapshot(docData));
       }
       notifyListeners();
     } catch (e) {

@@ -6,8 +6,11 @@ import 'package:b_barna_app/pdf/model/pdf_model.dart';
 
 class PdfViewModel extends ChangeNotifier {
   List<PdfModel> pdfList = [];
+  List<PdfModel> freePdfList = [];
+
   clearPdfList() {
     pdfList.clear();
+    freePdfList.clear();
   }
 
   fetchPdfList(List<String> pdfCodeList) async {
@@ -20,6 +23,23 @@ class PdfViewModel extends ChangeNotifier {
         DocumentSnapshot<Map<String, dynamic>> docData =
             querySnapshot.docs[i] as DocumentSnapshot<Map<String, dynamic>>;
         pdfList.add(PdfModel.fromDocumentSnapshot(docData));
+      }
+      notifyListeners();
+    } catch (e) {
+      log(e.toString());
+    }
+  }
+
+  fetchFreePdfList() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection(pdf)
+          .where("pdf_type", isEqualTo: "FREE")
+          .get();
+      for (int i = 0; i < querySnapshot.docs.length; i++) {
+        DocumentSnapshot<Map<String, dynamic>> docData =
+            querySnapshot.docs[i] as DocumentSnapshot<Map<String, dynamic>>;
+        freePdfList.add(PdfModel.fromDocumentSnapshot(docData));
       }
       notifyListeners();
     } catch (e) {

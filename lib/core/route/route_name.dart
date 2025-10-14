@@ -14,6 +14,10 @@ class RouteName {
     static const String termsConditionScreenRoute = "/terms_condition";
     static const String privacyPolicyScreenRoute = "/privacy_policy";
   static const String quizScreenRoute = "/quiz_screen";
+    static const String freeQuizScreenRoute = "/free_quiz_screen";
+    static const String freePdfScreenRoute = "/free_pdf_screen";
+    static const String freeVideoScreenRoute = "/free_video_screen";
+
   static const String loginScreenRoute = "/login_screen";
   static const String otpVerificationScreenRoute = "/otp_verification_screen";
   static const String razorPayScreenRoute = "/razor_pay_screen";
