@@ -67,18 +67,22 @@ class QuizRepo {
     }
   }
 
-  Future fetchFreeQuizList() async {
-    try {
-      QuerySnapshot<Map<String, dynamic>> snapshot = await _fireStore
-          .collection(quiz)
-          .where("quiz_type", isEqualTo: "FREE")
-          .get();
-      return snapshot.docs
-          .map((docSnapshot) => QuizModel.fromMap(docSnapshot.data()))
-          .toList();
-    } catch (e) {
-      log(e.toString());
-      return null;
-    }
+ Future<List<QuizModel>> fetchFreeQuizList() async {
+  try {
+    final snapshot = await _fireStore
+        .collection('quiz')
+        .where('quiz_type', isEqualTo: 'FREE')
+        .get();
+
+    return snapshot.docs.map((docSnapshot) {
+      final data = docSnapshot.data();
+      data['doc_id'] = docSnapshot.id; // ✅ add Firestore document ID manually
+      return QuizModel.fromMap(data);
+    }).toList();
+  } catch (e, stackTrace) {
+    log('Error in fetchFreeQuizList: $e');
+    log(stackTrace.toString());
+    return [];
   }
+}
 }

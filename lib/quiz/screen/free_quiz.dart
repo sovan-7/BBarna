@@ -41,7 +41,7 @@ class _QuizScreenState extends State<FreeQuizScreen> {
             child: Consumer<QuizViewModel>(
               builder: (context, quizDataProvider, child) {
                 return ListView.builder(
-                  itemCount: quizDataProvider.quizList.length,
+                  itemCount: quizDataProvider.freeQuizList.length,
                   itemBuilder: (context, index) {
                     return Container(
                       decoration: BoxDecoration(
@@ -54,20 +54,20 @@ class _QuizScreenState extends State<FreeQuizScreen> {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           TextViewBold(
-                            textContent: quizDataProvider.quizList[index].name,
+                            textContent: quizDataProvider.freeQuizList[index].name,
                             textSizeNumber: 22,
                             textColor: Colors.black,
                             textAlign: TextAlign.center,
                           ),
                           TextViewBold(
                             textContent:
-                                "Total Duration : ${getQuizTime(quizDataProvider.quizList[index].totalTime)}",
+                                "Total Duration : ${getQuizTime(quizDataProvider.freeQuizList[index].totalTime)}",
                             textSizeNumber: 22,
                             textColor: Colors.black,
                           ),
                           TextViewBold(
                             textContent:
-                                "Total Question : ${quizDataProvider.quizList[index].totalQuestion}",
+                                "Total Question : ${quizDataProvider.freeQuizList[index].totalQuestion}",
                             textSizeNumber: 22,
                             textColor: Colors.black,
                           ),
@@ -76,7 +76,7 @@ class _QuizScreenState extends State<FreeQuizScreen> {
                           InkWell(
                             onTap: () {
                               if (quizDataProvider
-                                      .quizList[index].totalQuestion !=
+                                      .freeQuizList[index].totalQuestion !=
                                   0) {
                                 ScoreViewModel scoreViewModel =
                                     Provider.of<ScoreViewModel>(context,
@@ -86,7 +86,7 @@ class _QuizScreenState extends State<FreeQuizScreen> {
                                   scoreViewModel.clearQuiz();
                                   scoreViewModel
                                       .getQuizResult(
-                                          quizDataProvider.quizList[index].code)
+                                          quizDataProvider.freeQuizList[index].code)
                                       .then((val) {
                                     Timestamp now = Timestamp.now();
                                     bool result = true;
@@ -105,7 +105,7 @@ class _QuizScreenState extends State<FreeQuizScreen> {
                                           RouteName.questionPaperScreenRoute,
                                           arguments: {
                                             "quizModel":
-                                                quizDataProvider.quizList[index]
+                                                quizDataProvider.freeQuizList[index]
                                           });
                                     } else {
                                       Navigator.pushNamed(
@@ -113,7 +113,7 @@ class _QuizScreenState extends State<FreeQuizScreen> {
                                           RouteName.scoreBoardScreenRoute,
                                           arguments: {
                                             "quizCode": quizDataProvider
-                                                .quizList[index].code
+                                                .freeQuizList[index].code
                                           });
                                     }
                                   });

@@ -25,9 +25,9 @@ class _FreeVideoListState extends State<FreeVideoList> {
     videoViewModel.clearVideoList();
     videoViewModel.fetchFreeVideoList().then((val) {
       setState(() {
-        if (videoViewModel.videoList.isNotEmpty) {
+        if (videoViewModel.freeVideoList.isNotEmpty) {
           videoId =
-              YoutubePlayer.convertUrlToId(videoViewModel.videoList[0].link)!;
+              YoutubePlayer.convertUrlToId(videoViewModel.freeVideoList[0].link)!;
 
           controller = YoutubePlayerController(
             initialVideoId: videoId,
@@ -136,7 +136,7 @@ class _FreeVideoListState extends State<FreeVideoList> {
                                       child: ListView.builder(
                                     controller: scrollController,
                                     itemCount:
-                                        videoDataProvider.videoList.length,
+                                        videoDataProvider.freeVideoList.length,
                                     itemBuilder: (context, index) {
                                       return InkWell(
                                         onTap: () {
@@ -145,7 +145,7 @@ class _FreeVideoListState extends State<FreeVideoList> {
                                             videoId =
                                                 YoutubePlayer.convertUrlToId(
                                                     videoDataProvider
-                                                        .videoList[index]
+                                                        .freeVideoList[index]
                                                         .link)!;
                                             controller!.load(videoId);
                                           });
@@ -176,7 +176,7 @@ class _FreeVideoListState extends State<FreeVideoList> {
                                                     color: Colors.white,
                                                   ),
                                                   videoDataProvider
-                                                          .videoList[index].link
+                                                          .freeVideoList[index].link
                                                           .contains(videoId)
                                                       ? const Icon(
                                                           Icons.pause,
@@ -200,7 +200,7 @@ class _FreeVideoListState extends State<FreeVideoList> {
                                                     child: TextViewBold(
                                                       textContent:
                                                           videoDataProvider
-                                                              .videoList[index]
+                                                              .freeVideoList[index]
                                                               .title,
                                                       textSizeNumber: 15,
                                                       textAlign: TextAlign.left,

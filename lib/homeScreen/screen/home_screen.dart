@@ -28,11 +28,12 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final allSvgImages = [
     "assets/images/svg/books.svg",
+    "assets/images/svg/test2.svg",
     "assets/images/svg/course.svg",
+    "assets/images/svg/test1.svg",
     "assets/images/svg/exam1.svg",
     "assets/images/svg/globe.svg",
-    "assets/images/svg/test2.svg",
-    "assets/images/svg/test1.svg",
+    
   ];
   List<String> subIconHeading = [
     "Paid Course",

@@ -52,7 +52,7 @@ class _PdfListState extends State<FreePdfList> {
             Consumer<PdfViewModel>(builder: (context, pdfDataProvider, child) {
           return GridView.builder(
               physics: const ClampingScrollPhysics(),
-              itemCount: pdfDataProvider.pdfList.length,
+              itemCount: pdfDataProvider.freePdfList.length,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
@@ -67,7 +67,7 @@ class _PdfListState extends State<FreePdfList> {
                         MaterialPageRoute(
                             builder: (context) => PdfViewerPage(
                                   pdfLink:
-                                      pdfDataProvider.pdfList[index].pdfLink,
+                                      pdfDataProvider.freePdfList[index].pdfLink,
                                 )));
                   },
                   child: Stack(
@@ -96,7 +96,7 @@ class _PdfListState extends State<FreePdfList> {
                                   padding: const EdgeInsets.only(
                                       left: 8.0, right: 8.0),
                                   child: Marquee(
-                                    text: pdfDataProvider.pdfList[index].title,
+                                    text: pdfDataProvider.freePdfList[index].title,
                                     velocity: 20,
                                     blankSpace: 50,
                                     style: const TextStyle(
@@ -113,15 +113,15 @@ class _PdfListState extends State<FreePdfList> {
                         ),
                       ),
                       Visibility(
-                        visible: pdfDataProvider.pdfList[index].isDownloadable,
+                        visible: pdfDataProvider.freePdfList[index].isDownloadable,
                         child: Positioned(
                             top: 10,
                             right: 10,
                             child: InkWell(
                               onTap: () async {
-                                // printPdf( pdfDataProvider.pdfList[index].pdfLink);
+                                // printPdf( pdfDataProvider.freePdfList[index].pdfLink);
                                 startDownload(
-                                    pdfDataProvider.pdfList[index].pdfLink);
+                                    pdfDataProvider.freePdfList[index].pdfLink);
                               },
                               child: const Icon(
                                 Icons.download,

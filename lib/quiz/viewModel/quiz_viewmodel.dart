@@ -26,7 +26,7 @@ class QuizViewModel extends ChangeNotifier {
   String quizCode = stringDefault;
   String quizName = stringDefault;
   bool isSubmitted = false;
-  List<QuestionModel> freeQuizList = [];
+  List<QuizModel> freeQuizList = [];
 
   clearQuizList() {
     quizList.clear();
