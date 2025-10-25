@@ -1,5 +1,6 @@
 // ignore_for_file: must_be_immutable
 
+import 'dart:developer';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -7,6 +8,8 @@ import 'package:marquee/marquee.dart';
 import 'package:b_barna_app/core/widgets/app_header.dart';
 import 'package:b_barna_app/pdf/screen/pdf_viewer_page.dart';
 import 'package:b_barna_app/pdf/viewModel/pdf_viewmodel.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class FreePdfList extends StatefulWidget {
@@ -24,8 +27,17 @@ class _PdfListState extends State<FreePdfList> {
         Provider.of<PdfViewModel>(context, listen: false);
     pdfViewModel.clearPdfList();
     pdfViewModel.fetchFreePdfList();
+
     initializeNotifications();
     super.initState();
+  }
+
+  Future<void> requestAndroidNotificationPermission() async {
+    try {
+      await Permission.notification.request();
+    } catch (e) {
+      requestAndroidNotificationPermission();
+    }
   }
 
   Future<void> initializeNotifications() async {
@@ -66,8 +78,8 @@ class _PdfListState extends State<FreePdfList> {
                         context,
                         MaterialPageRoute(
                             builder: (context) => PdfViewerPage(
-                                  pdfLink:
-                                      pdfDataProvider.freePdfList[index].pdfLink,
+                                  pdfLink: pdfDataProvider
+                                      .freePdfList[index].pdfLink,
                                 )));
                   },
                   child: Stack(
@@ -96,7 +108,8 @@ class _PdfListState extends State<FreePdfList> {
                                   padding: const EdgeInsets.only(
                                       left: 8.0, right: 8.0),
                                   child: Marquee(
-                                    text: pdfDataProvider.freePdfList[index].title,
+                                    text: pdfDataProvider
+                                        .freePdfList[index].title,
                                     velocity: 20,
                                     blankSpace: 50,
                                     style: const TextStyle(
@@ -113,15 +126,23 @@ class _PdfListState extends State<FreePdfList> {
                         ),
                       ),
                       Visibility(
-                        visible: pdfDataProvider.freePdfList[index].isDownloadable,
+                        visible: true,
+                        //pdfDataProvider.freePdfList[index].isDownloadable,
                         child: Positioned(
                             top: 10,
                             right: 10,
                             child: InkWell(
                               onTap: () async {
-                                // printPdf( pdfDataProvider.freePdfList[index].pdfLink);
-                                startDownload(
-                                    pdfDataProvider.freePdfList[index].pdfLink);
+                                bool status =
+                                    await Permission.notification.isGranted;
+                                if (status) {
+                                  startDownload(
+                                      pdfDataProvider
+                                          .freePdfList[index].pdfLink,
+                                      pdfDataProvider.freePdfList[index].title);
+                                } else {
+                                  requestAndroidNotificationPermission();
+                                }
                               },
                               child: const Icon(
                                 Icons.download,
@@ -139,27 +160,23 @@ class _PdfListState extends State<FreePdfList> {
     );
   }
 
-//  Future<void> printPdf(String pdfUrl) async {
-//     // Fetch PDF from URL
-//     final response = await http.get(Uri.parse(pdfUrl));
-//     final pdfBytes = response.bodyBytes;
+  Future<void> startDownload(String url, String fileName) async {
+    // Request permission first
+    //if (await Permission.storage.request().isGranted) {
+    // Use proper path
+    final dir = await getExternalStorageDirectories();
 
-//     // Open print dialog (no download button from Flutter side)
-//     await Printing.layoutPdf(
-//       onLayout: (format) async => pdfBytes,
-//     );
-//   }
-  void startDownload(String url) async {
-    String savePath =
-        "/storage/emulated/0/Download/file.pdf"; // Adjust for your platform
+    String savePath = '${dir!.first.path}/$fileName.pdf';
 
     await downloadFile(url, savePath);
+    // } else {
+    //   log("Storage permission denied");
+    // }
   }
 
   Future<void> downloadFile(String url, String savePath) async {
     Dio dio = Dio();
     int progress = 0;
-
     try {
       await dio.download(
         url,
@@ -206,6 +223,7 @@ class _PdfListState extends State<FreePdfList> {
         ),
       );
     } catch (e) {
+      log(e.toString());
       // Handle download error
       flutterLocalNotificationsPlugin.show(
         0,
