@@ -1,15 +1,11 @@
 // ignore_for_file: must_be_immutable
 
-import 'dart:developer';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:marquee/marquee.dart';
 import 'package:b_barna_app/core/widgets/app_header.dart';
 import 'package:b_barna_app/pdf/screen/pdf_viewer_page.dart';
 import 'package:b_barna_app/pdf/viewModel/pdf_viewmodel.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class FreePdfList extends StatefulWidget {
@@ -19,38 +15,15 @@ class FreePdfList extends StatefulWidget {
 }
 
 class _PdfListState extends State<FreePdfList> {
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
   @override
   void initState() {
     PdfViewModel pdfViewModel =
         Provider.of<PdfViewModel>(context, listen: false);
     pdfViewModel.clearPdfList();
     pdfViewModel.fetchFreePdfList();
-
-    initializeNotifications();
     super.initState();
   }
 
-  Future<void> requestAndroidNotificationPermission() async {
-    try {
-      await Permission.notification.request();
-    } catch (e) {
-      requestAndroidNotificationPermission();
-    }
-  }
-
-  Future<void> initializeNotifications() async {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    const InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
-
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-  }
-
-  Dio dio = Dio();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -133,16 +106,15 @@ class _PdfListState extends State<FreePdfList> {
                             right: 10,
                             child: InkWell(
                               onTap: () async {
-                                bool status =
-                                    await Permission.notification.isGranted;
-                                if (status) {
-                                  startDownload(
-                                      pdfDataProvider
-                                          .freePdfList[index].pdfLink,
-                                      pdfDataProvider.freePdfList[index].title);
-                                } else {
-                                  requestAndroidNotificationPermission();
-                                }
+                                FileDownloader.downloadFile(
+                                  url: pdfDataProvider
+                                      .freePdfList[index].pdfLink,
+                                  name:
+                                      "${pdfDataProvider.freePdfList[index].code}.pdf",
+                                  downloadDestination:
+                                      DownloadDestinations.appFiles,
+                                  notificationType: NotificationType.all,
+                                );
                               },
                               child: const Icon(
                                 Icons.download,
@@ -158,87 +130,5 @@ class _PdfListState extends State<FreePdfList> {
         }))
       ])),
     );
-  }
-
-  Future<void> startDownload(String url, String fileName) async {
-    // Request permission first
-    //if (await Permission.storage.request().isGranted) {
-    // Use proper path
-    final dir = await getExternalStorageDirectories();
-
-    String savePath = '${dir!.first.path}/$fileName.pdf';
-
-    await downloadFile(url, savePath);
-    // } else {
-    //   log("Storage permission denied");
-    // }
-  }
-
-  Future<void> downloadFile(String url, String savePath) async {
-    Dio dio = Dio();
-    int progress = 0;
-    try {
-      await dio.download(
-        url,
-        savePath,
-        onReceiveProgress: (received, total) {
-          if (total != -1) {
-            progress = ((received / total) * 100).toInt();
-
-            // Update notification with progress
-            flutterLocalNotificationsPlugin.show(
-              0,
-              'Downloading File',
-              '$progress% completed',
-              NotificationDetails(
-                android: AndroidNotificationDetails(
-                  'download_channel',
-                  'File Downloads',
-                  channelDescription: 'Shows progress for file downloads',
-                  importance: Importance.low,
-                  priority: Priority.low,
-                  showProgress: true,
-                  maxProgress: 100,
-                  progress: progress,
-                ),
-              ),
-            );
-          }
-        },
-      );
-
-      // Show completion notification
-      flutterLocalNotificationsPlugin.show(
-        0,
-        'Download Complete',
-        'File downloaded successfully!',
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'download_channel',
-            'File Downloads',
-            channelDescription: 'Shows progress for file downloads',
-            importance: Importance.high,
-            priority: Priority.high,
-          ),
-        ),
-      );
-    } catch (e) {
-      log(e.toString());
-      // Handle download error
-      flutterLocalNotificationsPlugin.show(
-        0,
-        'Download Failed',
-        'An error occurred during download',
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'download_channel',
-            'File Downloads',
-            channelDescription: 'Shows progress for file downloads',
-            importance: Importance.high,
-            priority: Priority.high,
-          ),
-        ),
-      );
-    }
   }
 }

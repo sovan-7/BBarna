@@ -23,7 +23,6 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
   sp = SharedPrefOperations.getInstance;
   sp?.init();
   await Firebase.initializeApp(

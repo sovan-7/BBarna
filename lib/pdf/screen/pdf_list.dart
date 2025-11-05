@@ -1,8 +1,7 @@
 // ignore_for_file: must_be_immutable
 
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:flutter_file_downloader/flutter_file_downloader.dart';
 import 'package:marquee/marquee.dart';
 import 'package:b_barna_app/core/widgets/app_header.dart';
 import 'package:b_barna_app/pdf/screen/pdf_viewer_page.dart';
@@ -18,8 +17,6 @@ class PdfList extends StatefulWidget {
 }
 
 class _PdfListState extends State<PdfList> {
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
   @override
   void initState() {
     PdfViewModel pdfViewModel =
@@ -27,21 +24,9 @@ class _PdfListState extends State<PdfList> {
 
     pdfViewModel.clearPdfList();
     pdfViewModel.fetchPdfList(widget.pdfCodeList);
-    initializeNotifications();
     super.initState();
   }
 
-  Future<void> initializeNotifications() async {
-    const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
-
-    const InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
-
-    await flutterLocalNotificationsPlugin.initialize(initializationSettings);
-  }
-
-  Dio dio = Dio();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -122,9 +107,18 @@ class _PdfListState extends State<PdfList> {
                             right: 10,
                             child: InkWell(
                               onTap: () async {
-                               // printPdf( pdfDataProvider.pdfList[index].pdfLink);
-                                startDownload(
-                                    pdfDataProvider.pdfList[index].pdfLink);
+                                if (pdfDataProvider
+                                    .pdfList[index].isDownloadable) {
+                                  FileDownloader.downloadFile(
+                                    url: pdfDataProvider
+                                        .freePdfList[index].pdfLink,
+                                    name: "${pdfDataProvider
+                                    .pdfList[index].code}.pdf",
+                                    downloadDestination:
+                                        DownloadDestinations.appFiles,
+                                    notificationType: NotificationType.all,
+                                  );
+                                }
                               },
                               child: const Icon(
                                 Icons.download,
@@ -152,78 +146,4 @@ class _PdfListState extends State<PdfList> {
 //       onLayout: (format) async => pdfBytes,
 //     );
 //   }
-  void startDownload(String url) async {
-    String savePath =
-        "/storage/emulated/0/Download/file.pdf"; // Adjust for your platform
-
-    await downloadFile(url, savePath);
-  }
-
-  Future<void> downloadFile(String url, String savePath) async {
-    Dio dio = Dio();
-    int progress = 0;
-
-    try {
-      await dio.download(
-        url,
-        savePath,
-        onReceiveProgress: (received, total) {
-          if (total != -1) {
-            progress = ((received / total) * 100).toInt();
-
-            // Update notification with progress
-            flutterLocalNotificationsPlugin.show(
-              0,
-              'Downloading File',
-              '$progress% completed',
-              NotificationDetails(
-                android: AndroidNotificationDetails(
-                  'download_channel',
-                  'File Downloads',
-                  channelDescription: 'Shows progress for file downloads',
-                  importance: Importance.low,
-                  priority: Priority.low,
-                  showProgress: true,
-                  maxProgress: 100,
-                  progress: progress,
-                ),
-              ),
-            );
-          }
-        },
-      );
-
-      // Show completion notification
-      flutterLocalNotificationsPlugin.show(
-        0,
-        'Download Complete',
-        'File downloaded successfully!',
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'download_channel',
-            'File Downloads',
-            channelDescription: 'Shows progress for file downloads',
-            importance: Importance.high,
-            priority: Priority.high,
-          ),
-        ),
-      );
-    } catch (e) {
-      // Handle download error
-      flutterLocalNotificationsPlugin.show(
-        0,
-        'Download Failed',
-        'An error occurred during download',
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'download_channel',
-            'File Downloads',
-            channelDescription: 'Shows progress for file downloads',
-            importance: Importance.high,
-            priority: Priority.high,
-          ),
-        ),
-      );
-    }
-  }
 }
