@@ -6,11 +6,11 @@ import 'package:b_barna_app/utils/helper.dart';
 class EnrolledCourseViewModel extends ChangeNotifier {
   final EnrolledCourseRepo _courseRepo = EnrolledCourseRepo();
   EnrolledCourseBaseModel? enrolledCourseBaseModel;
-  clearData() {
+  void clearData() {
     enrolledCourseBaseModel = null;
   }
 
-  getEnrolledCourseList() async {
+  Future<void> getEnrolledCourseList() async {
     try {
       enrolledCourseBaseModel = await _courseRepo.getCourseList();
       notifyListeners();
@@ -20,7 +20,7 @@ class EnrolledCourseViewModel extends ChangeNotifier {
     }
   }
 
-  Future enrolledCourse(newCourse) async {
+  Future enrolledCourse(dynamic newCourse) async {
     try {
       _courseRepo.addCourse(newCourse).then((value) {
         getEnrolledCourseList();

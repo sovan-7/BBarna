@@ -14,7 +14,7 @@ class ScoreViewModel extends ChangeNotifier {
   List<QuestionModel> questionList = [];
   int answerIndex = intDefault;
   int selectedAnswer = intDefault;
-  clearQuiz() {
+  void clearQuiz() {
     quizModel = null;
   }
 
@@ -98,7 +98,7 @@ class ScoreViewModel extends ChangeNotifier {
     }
   }
 
-  setQuestionIndex({required int index}) {
+  void setQuestionIndex({required int index}) {
     selectedQuestionIndex = index;
     selectedAnswer = questionList[index].selectedAnswer;
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -107,7 +107,7 @@ class ScoreViewModel extends ChangeNotifier {
     getAnswerIndex(index);
   }
 
-  clearData(List<QuestionModel> resultQuestion) {
+  void clearData(List<QuestionModel> resultQuestion) {
     selectedQuestionIndex = 0;
     questionList.clear();
     questionList.addAll(resultQuestion);
@@ -118,7 +118,7 @@ class ScoreViewModel extends ChangeNotifier {
     });
   }
 
-  getAnswerIndex(int index) {
+  void getAnswerIndex(int index) {
     if (questionList[index].answer == questionList[index].option1) {
       answerIndex = 1;
     } else if (questionList[index].answer == questionList[index].option2) {

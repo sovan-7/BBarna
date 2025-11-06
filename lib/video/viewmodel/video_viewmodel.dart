@@ -8,7 +8,7 @@ class VideoViewModel extends ChangeNotifier {
   List<VideoModel> videoList = [];
   List<VideoModel> freeVideoList = [];
 
-  clearVideoList() {
+  void clearVideoList() {
     videoList.clear();
     freeVideoList.clear();
   }

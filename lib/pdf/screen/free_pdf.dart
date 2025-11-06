@@ -9,7 +9,7 @@ import 'package:b_barna_app/pdf/viewModel/pdf_viewmodel.dart';
 import 'package:provider/provider.dart';
 
 class FreePdfList extends StatefulWidget {
-  FreePdfList({super.key});
+  const FreePdfList({super.key});
   @override
   State<FreePdfList> createState() => _PdfListState();
 }

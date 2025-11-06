@@ -8,12 +8,12 @@ class PdfViewModel extends ChangeNotifier {
   List<PdfModel> pdfList = [];
   List<PdfModel> freePdfList = [];
 
-  clearPdfList() {
+  void clearPdfList() {
     pdfList.clear();
     freePdfList.clear();
   }
 
-  fetchPdfList(List<String> pdfCodeList) async {
+  Future<void> fetchPdfList(List<String> pdfCodeList) async {
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection(pdf)
@@ -30,7 +30,7 @@ class PdfViewModel extends ChangeNotifier {
     }
   }
 
-  fetchFreePdfList() async {
+  Future<void> fetchFreePdfList() async {
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection(pdf)

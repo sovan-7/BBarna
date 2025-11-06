@@ -50,7 +50,7 @@ class SharedPrefOperations {
     return _prefs.getStringList(key) ?? [];
   }
 
-  clearPreference() async {
+  Future<void> clearPreference() async {
     await _prefs.clear();
   }
 }

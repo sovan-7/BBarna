@@ -10,7 +10,7 @@ class SubjectViewModel extends ChangeNotifier {
   List<String> courseTypeList = ["Full Course", "Part Course", "Mock Test"];
   List<String> fetchTypeList = [];
 
-  getSubjectList(String courseCode) async {
+  Future<void> getSubjectList(String courseCode) async {
     try {
       List<SubjectModel> subjectList = [];
       subjectMapList.clear();
@@ -43,7 +43,7 @@ class SubjectViewModel extends ChangeNotifier {
     }
   }
 
-  setAccessLevelOfUser(String subjectCode) {
+  void setAccessLevelOfUser(String subjectCode) {
     canAccessSubject = true;
   }
 }

@@ -12,7 +12,7 @@ import 'package:provider/provider.dart';
 
 // ignore: must_be_immutable
 class FreeQuizScreen extends StatefulWidget {
-  FreeQuizScreen({super.key});
+  const FreeQuizScreen({super.key});
 
   @override
   State<FreeQuizScreen> createState() => _QuizScreenState();

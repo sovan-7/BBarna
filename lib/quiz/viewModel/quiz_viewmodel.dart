@@ -28,11 +28,11 @@ class QuizViewModel extends ChangeNotifier {
   bool isSubmitted = false;
   List<QuizModel> freeQuizList = [];
 
-  clearQuizList() {
+  void clearQuizList() {
     quizList.clear();
   }
 
-  fetchQuizList(List<String> quizCodeList) async {
+  Future<void> fetchQuizList(List<String> quizCodeList) async {
     try {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection(quiz)
@@ -63,12 +63,12 @@ class QuizViewModel extends ChangeNotifier {
     }
   }
 
-  storeQuizDetails(String code, String name) {
+  void storeQuizDetails(String code, String name) {
     quizCode = code;
     quizName = name;
   }
 
-  fetchQuizQuestionList(List<String> questionCodeList) async {
+  Future<void> fetchQuizQuestionList(List<String> questionCodeList) async {
     selectedQuestionIndex = 0;
     try {
       quizQuestionList.clear();
@@ -116,12 +116,12 @@ class QuizViewModel extends ChangeNotifier {
     }
   }
 
-  setAnswerByUser(int optionIndex) {
+  void setAnswerByUser(int optionIndex) {
     quizQuestionList[selectedQuestionIndex].selectedAnswer = optionIndex;
     notifyListeners();
   }
 
-  setQuestionIndex({required int index}) {
+  void setQuestionIndex({required int index}) {
     selectedQuestionIndex = index;
     notifyListeners();
   }
@@ -154,7 +154,7 @@ class QuizViewModel extends ChangeNotifier {
     }
   }
 
-  getAnswerCount() {
+  void getAnswerCount() {
     isSubmitted = true;
     notifyListeners();
     for (int i = 0; i < quizQuestionList.length; i++) {
@@ -208,7 +208,7 @@ class QuizViewModel extends ChangeNotifier {
     return count;
   }
 
-  clearQuizQuestion() {
+  void clearQuizQuestion() {
     quizQuestionList.clear();
     timer?.cancel();
     timer = null;
@@ -219,12 +219,12 @@ class QuizViewModel extends ChangeNotifier {
     unAnswerCount = 0;
   }
 
-  setQuizTime(int count) {
+  void setQuizTime(int count) {
     remainingTimeCount = count * 60;
     copyTimeCount = remainingTimeCount;
   }
 
-  startTimer() {
+  void startTimer() {
     timer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
       if (remainingTimeCount > 0) {
         remainingTimeCount -= 1;

@@ -5,7 +5,7 @@ import 'package:b_barna_app/courseSection/repo/course_repo.dart';
 class CourseViewModel extends ChangeNotifier {
   final CourseRepo _courseRepo = CourseRepo();
   List<CourseModel> courseList = [];
-  getCourseList() async {
+  Future<void> getCourseList() async {
     try {
       courseList.clear();
       courseList = await _courseRepo.getCourseList();

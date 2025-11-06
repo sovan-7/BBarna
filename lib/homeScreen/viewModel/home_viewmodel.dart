@@ -14,7 +14,7 @@ class HomeViewModel with ChangeNotifier {
   List<SubjectModel> subjectList = [];
   List<TeacherModel> teacherList = [];
   late AboutModel aboutModel;
-  fetchBannerList() async {
+  Future<void> fetchBannerList() async {
     try {
       bannerList.clear();
       bannerList = await homeRepo.getBannerList();
@@ -24,7 +24,7 @@ class HomeViewModel with ChangeNotifier {
     }
   }
 
-  getSubjectList() async {
+  Future<void> getSubjectList() async {
     try {
       subjectList.clear();
       subjectList = await homeRepo.getSubjectList();
@@ -39,7 +39,7 @@ class HomeViewModel with ChangeNotifier {
     }
   }
 
-  fetchTeacherList() async {
+  Future<void> fetchTeacherList() async {
     try {
       teacherList = await homeRepo.getTeacherList();
       teacherList

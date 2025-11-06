@@ -593,7 +593,7 @@ class _QuestionPaperScreenState extends State<ViewResult> {
     return parsedString;
   }
 
-  reportQuestion(String quizName, String questionName) {
+  void reportQuestion(String quizName, String questionName) {
     showDialog(
         context: context,
         builder: (BuildContext context) {

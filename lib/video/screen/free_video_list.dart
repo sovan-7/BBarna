@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 class FreeVideoList extends StatefulWidget {
-  FreeVideoList({ super.key});
+  const FreeVideoList({ super.key});
 
   @override
   State<FreeVideoList> createState() => _FreeVideoListState();

@@ -6,7 +6,7 @@ import 'package:b_barna_app/core/constants/value_constants.dart';
 
 class AudioViewModel extends ChangeNotifier {
   List<AudioModel> audioList = [];
-  clearAudioList() {
+  void clearAudioList() {
     audioList.clear();
   }
 

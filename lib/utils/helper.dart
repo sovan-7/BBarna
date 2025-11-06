@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:b_barna_app/core/constants/value_constants.dart';
 
 class Helper {
-  static showSnackBarMessage(
+  static Future<void> showSnackBarMessage(
       {required String msg, required bool isSuccess}) async {
     ScaffoldMessenger.of(navigatorKey.currentContext!).showSnackBar(SnackBar(
       duration: const Duration(milliseconds: 750),

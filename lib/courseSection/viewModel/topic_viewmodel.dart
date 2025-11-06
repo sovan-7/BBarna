@@ -9,7 +9,7 @@ class TopicViewModel extends ChangeNotifier {
   List<TopicModel> topicList = [];
   late List<Color> cardColorList;
   late List<Color> textColorList;
-  getTopicList(String unitCode) async {
+  Future<void> getTopicList(String unitCode) async {
     try {
       topicList.clear();
       topicList = await _topicRepo.getTopicList(unitCode);

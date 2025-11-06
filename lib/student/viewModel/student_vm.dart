@@ -6,7 +6,7 @@ class StudentViewModel with ChangeNotifier {
   final StudentRepo _studentRepo = StudentRepo();
 
   Student? student;
-  clearData() {
+  void clearData() {
     student = null;
   }
 
@@ -19,7 +19,7 @@ class StudentViewModel with ChangeNotifier {
     return await _studentRepo.isStudentExist();
   }
 
-  addStudent(Student studentData) async {
+  Future<void> addStudent(Student studentData) async {
     await _studentRepo.addStudent(studentData).then((value) async {
       await setCurrentStudentData();
     });
