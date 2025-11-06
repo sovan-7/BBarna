@@ -106,15 +106,18 @@ class _PdfListState extends State<FreePdfList> {
                             right: 10,
                             child: InkWell(
                               onTap: () async {
-                                FileDownloader.downloadFile(
-                                  url: pdfDataProvider
-                                      .freePdfList[index].pdfLink,
-                                  name:
-                                      "${pdfDataProvider.freePdfList[index].code}.pdf",
-                                  downloadDestination:
-                                      DownloadDestinations.appFiles,
-                                  notificationType: NotificationType.all,
-                                );
+                                if (pdfDataProvider
+                                    .freePdfList[index].isDownloadable) {
+                                  FileDownloader.downloadFile(
+                                    url: pdfDataProvider
+                                        .freePdfList[index].pdfLink,
+                                    name:
+                                        "${pdfDataProvider.freePdfList[index].code}.pdf",
+                                    downloadDestination:
+                                        DownloadDestinations.appFiles,
+                                    notificationType: NotificationType.all,
+                                  );
+                                }
                               },
                               child: const Icon(
                                 Icons.download,

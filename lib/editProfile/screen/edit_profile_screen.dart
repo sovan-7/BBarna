@@ -190,7 +190,7 @@ class EditProfileScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 5),
                 child: TextViewBold(
-                  textContent: "Version:1.0.4",
+                  textContent: "Version:1.0.7",
                   textSizeNumber: 14,
                   textColor: Colors.grey[800],
                 ),
