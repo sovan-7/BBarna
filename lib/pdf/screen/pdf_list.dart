@@ -111,7 +111,7 @@ class _PdfListState extends State<PdfList> {
                                     .pdfList[index].isDownloadable) {
                                   FileDownloader.downloadFile(
                                     url: pdfDataProvider
-                                        .freePdfList[index].pdfLink,
+                                        .pdfList[index].pdfLink,
                                     name: "${pdfDataProvider
                                     .pdfList[index].code}.pdf",
                                     downloadDestination:
