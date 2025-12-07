@@ -25,6 +25,8 @@ class QuestionPaperScreen extends StatefulWidget {
 }
 
 class _QuestionPaperScreenState extends State<QuestionPaperScreen> {
+  ScrollController verticalScrollController = ScrollController();
+
   @override
   void initState() {
     QuizViewModel quizViewModel =
@@ -96,6 +98,7 @@ class _QuestionPaperScreenState extends State<QuestionPaperScreen> {
                                 ),
                                 Expanded(
                                   child: SingleChildScrollView(
+                                    controller: verticalScrollController,
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -114,8 +117,8 @@ class _QuestionPaperScreenState extends State<QuestionPaperScreen> {
                                                 .trim()
                                                 .isNotEmpty))
                                           Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 10, vertical: 8),
+                                            padding: const EdgeInsets.only(
+                                                left: 0, right: 15),
                                             child: Html(
                                               data: quizDataProvider
                                                   .quizQuestionList[
@@ -124,19 +127,31 @@ class _QuestionPaperScreenState extends State<QuestionPaperScreen> {
                                                   .questionBody,
                                               style: {
                                                 "table": Style(
-                                                  border: Border.all(
-                                                      color: Colors.grey),
                                                   backgroundColor:
                                                       Colors.transparent,
-                                                  padding: HtmlPaddings.all(8),
+                                                  padding: HtmlPaddings.zero,
                                                 ),
                                                 "td": Style(
-                                                  border: Border.all(
-                                                      color: Colors.white),
+                                                  border: Border.symmetric(
+                                                      vertical: BorderSide(
+                                                          width: 1,
+                                                          color: Colors.grey),
+                                                      horizontal: BorderSide(
+                                                          width: 0.5,
+                                                          color: Colors.grey)),
                                                   padding: HtmlPaddings.all(6),
                                                   fontSize: FontSize(14.0),
+                                                  alignment: Alignment
+                                                      .centerLeft, // <-- FIX alignment
+                                                  verticalAlign: VerticalAlign
+                                                      .top, // <-- keeps text aligned to top
                                                   fontFamily: 'Kalpurush',
-                                                  color: Colors.white,
+                                                  color:
+                                                      Colors.black, // MUST FIX
+                                                ),
+                                                "tr": Style(
+                                                  alignment: Alignment
+                                                      .centerLeft, // ensures row alignment
                                                 ),
                                                 "th": Style(
                                                   padding: HtmlPaddings.all(6),
@@ -144,25 +159,22 @@ class _QuestionPaperScreenState extends State<QuestionPaperScreen> {
                                                       Colors.grey.shade700,
                                                   color: Colors.white,
                                                   fontWeight: FontWeight.bold,
+                                                  alignment: Alignment
+                                                      .center, // center align header texts
                                                 ),
                                                 "p": Style(
+                                                  margin: Margins
+                                                      .zero, // removes Word margins
+
                                                   fontSize: FontSize(14.0),
-                                                  color: Colors.white,
+                                                  color:
+                                                      Colors.black, // MUST FIX
                                                 ),
                                               },
                                               extensions: const [
                                                 TableHtmlExtension(), // IMPORTANT to render tables
                                               ],
                                             ),
-                                            //   TextViewBold(
-                                            //       textContent: parseHtmlString(
-                                            //           getHTMLContent(quizDataProvider
-                                            //               .quizQuestionList[
-                                            //                   quizDataProvider
-                                            //                       .selectedQuestionIndex]
-                                            //               .questionBody)),
-                                            //       textColor: Colors.black,
-                                            //       textSizeNumber: 14),
                                           ),
                                         Visibility(
                                           visible: (quizDataProvider
@@ -545,28 +557,13 @@ class _QuestionPaperScreenState extends State<QuestionPaperScreen> {
   }
 
   String getHTMLContent(String content) {
-    return '''
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="UTF-8">
-      <style>
-        @font-face {
-          font-family: 'Kalpurush';
-          src: url('https://cdn.jsdelivr.net/gh/sovon/kalpurush/kalpurush.ttf') format('truetype');
-        }
-        body {
-          background-color: #000000;
-          color: #ffffff;
-          font-family: Kalpurush, sans-serif;
-        }
-      </style>
-    </head>
-    <body>
-      $content
-    </body>
-    </html>
-  ''';
+    final bodyStart = content.indexOf("<body>");
+    final bodyEnd = content.indexOf("</body>");
+
+    if (bodyStart != -1 && bodyEnd != -1) {
+      return content.substring(bodyStart + 6, bodyEnd).trim();
+    }
+    return content;
   }
 
   String parseHtmlString(String htmlString) {
@@ -574,10 +571,15 @@ class _QuestionPaperScreenState extends State<QuestionPaperScreen> {
     final String parsedString = document.body?.text ?? '';
     return parsedString;
   }
+
   bool isMoreThan24Hours(Timestamp t1, Timestamp t2) {
-  DateTime d1 = t1.toDate();
-  DateTime d2 = t2.toDate();
-  Duration difference = d1.difference(d2).abs();
-  return difference.inHours > 24;
-}
+    DateTime d1 = t1.toDate();
+    DateTime d2 = t2.toDate();
+    Duration difference = d1.difference(d2).abs();
+    return difference.inHours > 24;
+  }
+
+  String wrapTable(String html) {
+    return '<div style="display:inline-block;float:left;">$html</div>';
+  }
 }
