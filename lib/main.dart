@@ -1,3 +1,5 @@
+import 'package:b_barna_app/pushNotification/push_notification_service.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 //import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 import 'package:b_barna_app/audio/viewModel/audio_viewmodel.dart';
@@ -28,6 +30,10 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  // 🔥 VERY IMPORTANT — register here
+  FirebaseMessaging.onBackgroundMessage(
+      firebaseMessagingBackgroundHandler);
+  await PushNotificationService().init();
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(
       create: (_) => StudentViewModel(),
