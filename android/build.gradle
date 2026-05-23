@@ -1,33 +1,19 @@
-// ✅ Kotlin version declaration for legacy support
 buildscript {
-    ext.kotlin_version = '2.2.0'
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-       // classpath 'com.android.tools.build:gradle:8.5.2'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version" // ✅ ADD THIS
-        classpath 'com.google.gms:google-services:4.4.3' // if using Firebase
+        classpath "com.android.tools.build:gradle:8.13.2"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.0"
+        classpath "com.google.gms:google-services:4.4.4"
     }
 }
-
-// ✅ REMOVE plugins block — not needed here for pre-3.19 Flutter apps
 
 allprojects {
     repositories {
         google()
         mavenCentral()
-    }
-
-    configurations.all {
-        resolutionStrategy {
-            eachDependency { details ->
-                if (details.requested.group == "androidx.activity") {
-                    details.useVersion "1.7.2"
-                }
-            }
-        }
     }
 }
 

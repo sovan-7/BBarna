@@ -1,7 +1,7 @@
+import 'package:b_barna_app/liveClass/providers/chat_provider.dart';
 import 'package:b_barna_app/pushNotification/push_notification_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-//import 'package:flutter_windowmanager/flutter_windowmanager.dart';
 import 'package:b_barna_app/audio/viewModel/audio_viewmodel.dart';
 import 'package:b_barna_app/core/constants/value_constants.dart';
 import 'package:b_barna_app/core/route/app_route.dart';
@@ -35,6 +35,8 @@ void main() async {
       firebaseMessagingBackgroundHandler);
   await PushNotificationService().init();
   runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(create: (_) => ChatProvider()),
+
     ChangeNotifierProvider(
       create: (_) => StudentViewModel(),
     ),
@@ -49,6 +51,7 @@ void main() async {
     ChangeNotifierProvider(create: (_) => AudioViewModel()),
     ChangeNotifierProvider(create: (_) => HomeViewModel()),
     ChangeNotifierProvider(create: (_) => EnrolledCourseViewModel()),
+
   ], child: const MyApp()));
 }
 

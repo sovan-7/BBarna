@@ -79,13 +79,13 @@ class LogoutDialog extends StatelessWidget {
                     onTap: () async {
                       final FirebaseFirestore fireStore =
                           FirebaseFirestore.instance;
-
+                      int count = sp?.getIntFromPref("skipCount") ?? 0;
                       await fireStore
                           .collection(student)
                           .doc(sp?.getStringFromPref(SPKeys.studentId))
                           .update({"device_count": 0}).then((value) {
                         sp?.clearPreference();
-
+                        sp?.setIntToPref("skipCount", count) ?? 0;
                         Navigator.pushReplacementNamed(
                             context, RouteName.loginScreenRoute);
                       });

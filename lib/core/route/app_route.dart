@@ -1,3 +1,5 @@
+import 'package:b_barna_app/liveClass/models/live_class_model.dart';
+import 'package:b_barna_app/liveClass/screens/live_class_screen.dart';
 import 'package:b_barna_app/pdf/screen/free_pdf.dart';
 import 'package:b_barna_app/quiz/screen/free_quiz.dart';
 import 'package:b_barna_app/video/screen/free_video_list.dart';
@@ -91,11 +93,11 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) {
           return FreeQuizScreen();
         });
-        case RouteName.freePdfScreenRoute:
+      case RouteName.freePdfScreenRoute:
         return MaterialPageRoute(builder: (_) {
           return FreePdfList();
         });
-        case RouteName.freeVideoScreenRoute:
+      case RouteName.freeVideoScreenRoute:
         return MaterialPageRoute(builder: (_) {
           return FreeVideoList();
         });
@@ -129,6 +131,14 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const TermsConditionScreen());
       case RouteName.privacyPolicyScreenRoute:
         return MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen());
+
+      case RouteName.liveClassRoute:
+        return MaterialPageRoute(builder: (_) {
+          final arguments = (settings.arguments ?? <String, String>{}) as Map;
+          return LiveClassScreen(
+              liveClass: arguments["liveClass"]
+          );
+        });
       default:
         return _errorRoute();
     }

@@ -31,7 +31,7 @@ class SharedPrefOperations {
   }
 
   int getIntFromPref(String key) {
-    return _prefs.getInt(key) ?? intDefault;
+    return _prefs.getInt(key) ?? 0;
   }
 
   bool getBoolFromPref(String key) {

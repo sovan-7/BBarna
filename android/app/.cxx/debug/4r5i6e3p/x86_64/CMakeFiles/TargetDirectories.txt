@@ -1,0 +1,2 @@
+/Users/sovanlalmaity/Downloads/b_barna projects/b_barna_app/android/app/.cxx/debug/4r5i6e3p/x86_64/CMakeFiles/edit_cache.dir
+/Users/sovanlalmaity/Downloads/b_barna projects/b_barna_app/android/app/.cxx/debug/4r5i6e3p/x86_64/CMakeFiles/rebuild_cache.dir

@@ -1,5 +1,5 @@
+import 'package:b_barna_app/liveClass/screens/live_class_list_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:b_barna_app/core/widgets/app_header.dart';
 import 'package:b_barna_app/courseSection/screen/course_list.dart';
 import 'package:b_barna_app/courseSection/viewModel/course_view_model.dart';
 import 'package:b_barna_app/editProfile/screen/edit_profile_screen.dart';
@@ -7,7 +7,6 @@ import 'package:b_barna_app/enrolledCourses/enrolledCourseViewmodel/enrolled_vie
 import 'package:b_barna_app/homeScreen/screen/home_screen.dart';
 import 'package:b_barna_app/homeScreen/viewModel/home_viewmodel.dart';
 import 'package:b_barna_app/student/viewModel/student_vm.dart';
-import 'package:b_barna_app/textSize/text_view_bold.dart';
 import 'package:provider/provider.dart';
 
 class BottomNavBar extends StatefulWidget {
@@ -29,22 +28,23 @@ class _BottomNavBarState extends State<BottomNavBar> {
     const HomeScreen(),
     const CourseList(),
     const EditProfileScreen(),
-    Container(
-      alignment: Alignment.center,
-      color: const Color(0xFF09636E).withOpacity(0.05),
-      child: Column(
-        children: [
-          AppHeader(),
-          const Spacer(),
-          TextViewBold(
-            textContent: "Coming Soon",
-            textSizeNumber: 15,
-            textColor: Colors.black,
-          ),
-          const Spacer(),
-        ],
-      ),
-    ),
+    LiveClassListScreen(),
+    // Container(
+    //   alignment: Alignment.center,
+    //   color: const Color(0xFF09636E).withOpacity(0.05),
+    //   child: Column(
+    //     children: [
+    //       AppHeader(),
+    //       const Spacer(),
+    //       TextViewBold(
+    //         textContent: "Coming Soon",
+    //         textSizeNumber: 15,
+    //         textColor: Colors.black,
+    //       ),
+    //       const Spacer(),
+    //     ],
+    //   ),
+    // ),
   ];
   int selectedIndex = 0;
   @override

@@ -24,5 +24,7 @@ class RouteName {
   static const String splashScreenRoute = "/splash_screen";
     static const String pdfList = "/pdf_list";
      static const String viewResult = "/view_result";
+  static const String liveClassRoute = "/live_class";
+  static const String liveClassList = "/live_class_list";
 
 }
