@@ -34,49 +34,51 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (!context.mounted) return;
 
-    if (!result.hasUpdate) {
-      await Future.delayed(const Duration(milliseconds: 100));
+    // Always navigate first
+    await _navigateAfterCheck(context);
 
-      if (!context.mounted) return;
+    if (!context.mounted) return;
 
-      await _navigateAfterCheck(context);
-    } else {
+    if (result.hasUpdate) {
       int count = sp?.getIntFromPref("skipCount") ?? 0;
       final bool skipLimitReached =
           result.skipCount > 0 && count >= result.skipCount;
 
       final bool showAsForce = result.forceUpdate || skipLimitReached;
 
+      // Small delay to let destination screen fully render
+      await Future.delayed(const Duration(milliseconds: 300));
+
+      if (!context.mounted) return;
+
       showGeneralDialog(
-          context: context,
-          barrierColor: Colors.black54,
-          useRootNavigator: true,
-          barrierLabel: 'Update Dialog',
-          barrierDismissible: !showAsForce,
-          transitionDuration: const Duration(milliseconds: 2000),
-          pageBuilder: (_, __, ___) {
-            return AppUpdateDialog(
-              isForceUpdate: showAsForce,
-              onUpdate: () {
-                Navigator.pop(context);
-                _launchStore();
-              },
-              onSkip: showAsForce
-                  ? null
-                  : () async {
-                Navigator.of(context, rootNavigator: true).pop();
-
-                      sp?.setIntToPref("skipCount", count + 1);
-
-                      if (!context.mounted) return;
-
-                      await _navigateAfterCheck(context);
-                    },
-            );
-          });
+        context: context,
+        barrierColor: Colors.black54,
+        useRootNavigator: true,
+        barrierLabel: 'Update Dialog',
+        barrierDismissible: !showAsForce,
+        transitionDuration: const Duration(milliseconds: 300),
+        transitionBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+        pageBuilder: (dialogContext, __, ___) {
+          return AppUpdateDialog(
+            isForceUpdate: showAsForce,
+            onUpdate: () {
+              Navigator.pop(dialogContext);
+              _launchStore();
+            },
+            onSkip: showAsForce
+                ? null
+                : () async {
+              Navigator.pop(dialogContext);
+              sp?.setIntToPref("skipCount", count + 1);
+            },
+          );
+        },
+      );
     }
   }
-
   Future<void> _navigateAfterCheck(BuildContext context) async {
     final isLoggedIn = sp?.getBoolFromPref(SPKeys.isLoggedIn) ?? false;
 
