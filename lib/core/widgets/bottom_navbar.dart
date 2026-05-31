@@ -1,4 +1,4 @@
-import 'package:b_barna_app/liveClass/screens/live_class_list_screen.dart';
+import 'package:b_barna_app/liveClass/screens/class_tab_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:b_barna_app/courseSection/screen/course_list.dart';
 import 'package:b_barna_app/courseSection/viewModel/course_view_model.dart';
@@ -28,7 +28,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     const HomeScreen(),
     const CourseList(),
     const EditProfileScreen(),
-    LiveClassListScreen(),
+    ClassTabsScreen(),
     // Container(
     //   alignment: Alignment.center,
     //   color: const Color(0xFF09636E).withOpacity(0.05),

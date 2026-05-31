@@ -132,13 +132,13 @@ class AppRouter {
       case RouteName.privacyPolicyScreenRoute:
         return MaterialPageRoute(builder: (_) => const PrivacyPolicyScreen());
 
-      case RouteName.liveClassRoute:
-        return MaterialPageRoute(builder: (_) {
-          final arguments = (settings.arguments ?? <String, String>{}) as Map;
-          return LiveClassScreen(
-              liveClass: arguments["liveClass"]
-          );
-        });
+      // case RouteName.liveClassRoute:
+      //   return MaterialPageRoute(builder: (_) {
+      //     final arguments = (settings.arguments ?? <String, String>{}) as Map;
+      //     return LiveClassScreen(
+      //         liveClass: arguments["liveClass"]
+      //     );
+      //   });
       default:
         return _errorRoute();
     }

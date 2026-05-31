@@ -1,41 +1,55 @@
+import 'package:b_barna_app/core/constants/value_constants.dart';
+
 class LiveClassModel {
-  final int endTime;
-  final int startTime;
-  final String teacherName;
-  final String thumbnail;
+  final String id;
+  final String subject;
+  final String subjectId;
   final String title;
-  final String youtubeVideoId;
+  final String subtitle;
+  final String teacherName;
+  final int startTime;
+  final int endTime;
+  final String youtubeVideoLink;
 
   LiveClassModel({
-    required this.endTime,
-    required this.startTime,
-    required this.teacherName,
-    required this.thumbnail,
+    required this.id,
+    required this.subject,
+    required this.subjectId,
     required this.title,
-    required this.youtubeVideoId,
+    required this.subtitle,
+    required this.teacherName,
+    required this.startTime,
+    required this.endTime,
+    required this.youtubeVideoLink,
   });
 
   factory LiveClassModel.fromMap(
       Map<String, dynamic> map,
+      String documentId,
       ) {
     return LiveClassModel(
-      endTime: map['endTime'] ?? 0,
+      id: documentId,
+      subject: map['subject'] ?? stringDefault,
+      subjectId:map['subjectId'] ?? stringDefault,
+      title: map['title'] ?? stringDefault,
+      subtitle: map['subtitle'] ?? stringDefault,
+      teacherName: map['teacherName'] ?? stringDefault,
       startTime: map['startTime'] ?? 0,
-      teacherName: map['teacherName'] ?? '',
-      thumbnail: map['thumbnail'] ?? '',
-      title: map['title'] ?? '',
-      youtubeVideoId: map['youtubeVideoId'] ?? '',
+      endTime: map['endTime'] ?? 0,
+      youtubeVideoLink: map['youtubeVideoLink'] ?? stringDefault,
     );
   }
 
   Map<String, dynamic> toMap() {
     return {
-      'endTime': endTime,
-      'startTime': startTime,
-      'teacherName': teacherName,
-      'thumbnail': thumbnail,
+      'subject': subject,
+      "subjectId":subjectId,
       'title': title,
-      'youtubeVideoId': youtubeVideoId,
+      'subtitle': subtitle,
+      'teacherName': teacherName,
+      'startTime': startTime,
+      'endTime': endTime,
+      'youtubeVideoLink': youtubeVideoLink,
     };
   }
 }

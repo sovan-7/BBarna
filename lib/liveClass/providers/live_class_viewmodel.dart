@@ -1,0 +1,162 @@
+import 'package:b_barna_app/core/constants/value_constants.dart';
+import 'package:b_barna_app/core/widgets/loader_dialog.dart';
+import 'package:b_barna_app/liveClass/models/live_class_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:b_barna_app/liveClass/models/live_user.dart';
+
+class LiveClassViewModel extends ChangeNotifier {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  List<LiveClassModel> _allClasses = [];
+  bool _isLoading = false;
+  String? _error;
+  bool get isLoading => _isLoading;
+  String? get error => _error;
+
+  List<LiveClassModel> get liveClasses => _allClasses.where((c) {
+        final now = DateTime.now().millisecondsSinceEpoch;
+        return c.startTime <= now && now <= c.endTime;
+      }).toList();
+
+  List<LiveClassModel> get upcomingClasses => _allClasses
+      .where((c) => c.startTime > DateTime.now().millisecondsSinceEpoch)
+      .toList()
+    ..sort((a, b) => a.startTime.compareTo(b.startTime));
+
+  List<LiveClassModel> get pastClasses => _allClasses
+      .where((c) => c.endTime < DateTime.now().millisecondsSinceEpoch)
+      .toList()
+    ..sort((a, b) => b.startTime.compareTo(a.startTime));
+
+  final db = FirebaseDatabase.instance.ref();
+  List<LiveUser> users = [];
+  String mentionQuery = "";
+
+  Future<void> fetchClasses() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+    LoaderDialog.show(navigatorKey.currentContext!);
+    try {
+      final snapshot = await _firestore.collection('live_classes').get();
+      _allClasses = snapshot.docs
+          .map((doc) => LiveClassModel.fromMap(doc.data(), doc.id))
+          .toList();
+    } catch (e) {
+      LoaderDialog.hide(navigatorKey.currentContext!);
+      _error = 'Failed to load classes. Please try again.';
+    } finally {
+      LoaderDialog.hide(navigatorKey.currentContext!);
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  void listenParticipants(String roomId) {
+    db.child("live_rooms/$roomId/participants").onValue.listen((event) {
+      final data = event.snapshot.value;
+
+      if (data == null) return;
+
+      final map = Map<String, dynamic>.from(data as Map);
+
+      users = map.entries.map((e) {
+        return LiveUser.fromMap(
+          e.key,
+          Map<String, dynamic>.from(e.value),
+        );
+      }).toList();
+
+      notifyListeners();
+    });
+  }
+
+  void updateMentionQuery(String value) {
+    mentionQuery = value;
+    notifyListeners();
+  }
+
+  List<LiveUser> get filteredUsers {
+    if (mentionQuery.isEmpty) return [];
+
+    return users.where((u) {
+      return u.name.toLowerCase().contains(
+            mentionQuery.toLowerCase(),
+          );
+    }).toList();
+  }
+
+  Future<void> sendMessage({
+    required String roomId,
+    required String senderId,
+    required String senderName,
+    required String text,
+  }) async {
+    if (text.trim().isEmpty) return;
+
+    final msgRef = db.child("live_rooms/$roomId/messages").push();
+
+    await msgRef.set({
+      "senderId": senderId,
+      "senderName": senderName,
+      "text": text,
+      "timestamp": DateTime.now().millisecondsSinceEpoch,
+    });
+  }
+
+  String formatTimeSlot(LiveClassModel c) {
+    final start = DateTime.fromMillisecondsSinceEpoch(c.startTime);
+    final end = DateTime.fromMillisecondsSinceEpoch(c.endTime);
+    return '${_fmt(start)} – ${_fmt(end)}';
+  }
+
+  String formatDateLabel(LiveClassModel c) {
+    final start = DateTime.fromMillisecondsSinceEpoch(c.startTime);
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final classDay = DateTime(start.year, start.month, start.day);
+    final diff = classDay.difference(today).inDays;
+
+    if (diff == 0) return 'Today';
+    if (diff == 1) return 'Tomorrow';
+    if (diff == -1) return 'Yesterday';
+    return '${start.day} ${_month(start.month)}';
+  }
+
+  String _fmt(DateTime dt) {
+    final h = dt.hour % 12 == 0 ? 12 : dt.hour % 12;
+    final m = dt.minute.toString().padLeft(2, '0');
+    final period = dt.hour < 12 ? 'AM' : 'PM';
+    return '$h:$m $period';
+  }
+
+  String _month(int m) => const [
+        '',
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec'
+      ][m];
+
+ String getButtonStatus(LiveClassModel c,String classStatus){
+   String status="";
+   if(classStatus == "upcoming") {
+     status= formatDateLabel(c);
+   }else
+   if(classStatus == "live") {
+     status= "Join Now";
+   }else if(classStatus == "past") {
+     status="Watch Recording";
+ }
+   return status;
+ }
+}
