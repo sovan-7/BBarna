@@ -74,43 +74,43 @@ class _ClassTabsScreenState extends State<ClassTabsScreen>
             ],
           ),
         ),
-        body:  viewModel.error != null
-                ? Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.wifi_off_rounded,
-                            size: 40, color: Color(0xFFCCCCCC)),
-                        const SizedBox(height: 12),
-                        Text(viewModel.error!,
-                            style: const TextStyle(color: Color(0xFF888888))),
-                        const SizedBox(height: 12),
-                        TextButton(
-                            onPressed: viewModel.fetchClasses,
-                            child: const Text('Retry')),
-                      ],
-                    ),
-                  )
-                : TabBarView(
-                    controller: _tabController,
-                    children: [
-                      ClassListView(
-                        classes: viewModel.upcomingClasses,
-                        vm: viewModel,
-                        classStatus: "upcoming",
-                      ),
-                      ClassListView(
-                        classes: viewModel.liveClasses,
-                        vm: viewModel,
-                        classStatus: "live",
-                      ),
-                      ClassListView(
-                        classes: viewModel.pastClasses,
-                        vm: viewModel,
-                        classStatus: "past",
-                      ),
-                    ],
+        body: viewModel.error != null
+            ? Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.wifi_off_rounded,
+                        size: 40, color: Color(0xFFCCCCCC)),
+                    const SizedBox(height: 12),
+                    Text(viewModel.error!,
+                        style: const TextStyle(color: Color(0xFF888888))),
+                    const SizedBox(height: 12),
+                    TextButton(
+                        onPressed: viewModel.fetchClasses,
+                        child: const Text('Retry')),
+                  ],
+                ),
+              )
+            : TabBarView(
+                controller: _tabController,
+                children: [
+                  ClassListView(
+                    classes: viewModel.upcomingClasses,
+                    vm: viewModel,
+                    classStatus: "upcoming",
                   ),
+                  ClassListView(
+                    classes: viewModel.liveClasses,
+                    vm: viewModel,
+                    classStatus: "live",
+                  ),
+                  ClassListView(
+                    classes: viewModel.pastClasses,
+                    vm: viewModel,
+                    classStatus: "past",
+                  ),
+                ],
+              ),
       );
     });
   }

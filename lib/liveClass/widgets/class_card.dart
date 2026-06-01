@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:b_barna_app/liveClass/models/live_class_model.dart';
 import 'package:b_barna_app/liveClass/providers/live_class_viewmodel.dart';
+import 'package:b_barna_app/liveClass/screens/live_class_screen.dart';
 import 'package:b_barna_app/textSize/text_view_bold.dart';
 import 'package:flutter/material.dart';
 
@@ -176,7 +177,12 @@ class _ClassCardState extends State<ClassCard> {
 
                 // Button
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ClassroomScreen(item: widget.item,)));
+                  },
                   child: Container(
                       width: double.infinity,
                       height: 35,
@@ -188,7 +194,8 @@ class _ClassCardState extends State<ClassCard> {
                           border: Border.all(
                               color: widget.classStatus == "upcoming"
                                   ? Colors.black.withValues(alpha: 0.3)
-                                  : Colors.transparent,width: 1.3)),
+                                  : Colors.transparent,
+                              width: 1.3)),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
