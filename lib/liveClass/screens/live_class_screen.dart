@@ -1,74 +1,15 @@
+import 'package:b_barna_app/core/constants/value_constants.dart';
+import 'package:b_barna_app/liveClass/models/chat_message.dart';
 import 'package:b_barna_app/liveClass/models/live_class_model.dart';
+import 'package:b_barna_app/liveClass/models/live_user.dart';
 import 'package:b_barna_app/textSize/text_view_bold.dart';
+import 'package:b_barna_app/utils/sp_keys.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'video_player_screen.dart';
 import 'chat_tab_screen.dart';
 import 'people_tab_screen.dart';
-
-class ChatMessage {
-  final String initials;
-  final String name;
-  final String text;
-  final String time;
-  final Color avatarBg;
-  final Color avatarFg;
-  final bool isMe;
-
-  const ChatMessage({
-    required this.initials,
-    required this.name,
-    required this.text,
-    required this.time,
-    required this.avatarBg,
-    required this.avatarFg,
-    this.isMe = false,
-  });
-}
-
-final List<ChatMessage> sampleMessages = [
-  const ChatMessage(
-    initials: 'TS',
-    name: 'Tanvi S.',
-    text: 'Can you replay the interference part?',
-    time: '14:10',
-    avatarBg: Color(0xFFE1F5EE),
-    avatarFg: Color(0xFF085041),
-  ),
-  const ChatMessage(
-    initials: 'AK',
-    name: 'Arjun K.',
-    text: 'Is the formula A₁ + A₂ for constructive?',
-    time: '14:15',
-    avatarBg: Color(0xFFFBEAF0),
-    avatarFg: Color(0xFF712B13),
-  ),
-  const ChatMessage(
-    initials: 'RN',
-    name: 'Rhea N.',
-    text: 'Yes! Out of phase means subtraction.',
-    time: '14:16',
-    avatarBg: Color(0xFFFAEEDA),
-    avatarFg: Color(0xFF633806),
-  ),
-  const ChatMessage(
-    initials: 'YO',
-    name: 'You',
-    text: 'Thanks, that makes sense now!',
-    time: '14:18',
-    avatarBg: Color(0xFFEEEDFE),
-    avatarFg: Color(0xFF3C3489),
-    isMe: true,
-  ),
-  const ChatMessage(
-    initials: 'PM',
-    name: 'Priya M.',
-    text: 'Will this be on the test?',
-    time: '14:20',
-    avatarBg: Color(0xFFE6F1FB),
-    avatarFg: Color(0xFF0C447C),
-  ),
-];
 
 class ClassroomScreen extends StatefulWidget {
   final LiveClassModel item;
@@ -82,7 +23,6 @@ class _ClassroomScreenState extends State<ClassroomScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final TextEditingController _msgController = TextEditingController();
-  final List<ChatMessage> _messages = List.from(sampleMessages);
   bool _isPlaying = false;
   late YoutubePlayerController youtubePlayerController;
   static const Color _bgGrey = Color(0xFFF5F6FA);
@@ -92,6 +32,11 @@ class _ClassroomScreenState extends State<ClassroomScreen>
     Icons.chat_bubble_outline_rounded,
     Icons.people_outline_rounded,
   ];
+  final DatabaseReference _db = FirebaseDatabase.instance.ref();
+
+  List<ChatMessage> _messages = [];
+  List<LiveUser> _participants = [];
+
   @override
   void initState() {
     super.initState();
@@ -111,6 +56,7 @@ class _ClassroomScreenState extends State<ClassroomScreen>
       ),
     );
     _tabController = TabController(length: 2, vsync: this);
+    _listenToMessages();
   }
 
   @override
@@ -120,20 +66,25 @@ class _ClassroomScreenState extends State<ClassroomScreen>
     super.dispose();
   }
 
-  void _sendMessage() {
+  void _sendMessage() async {
     final text = _msgController.text.trim();
     if (text.isEmpty) return;
-    setState(() {
-      _messages.add(ChatMessage(
-        initials: 'YO',
-        name: 'You',
-        text: text,
-        time: TimeOfDay.now().format(context),
-        avatarBg: const Color(0xFFEEEDFE),
-        avatarFg: const Color(0xFF3C3489),
-        isMe: true,
-      ));
-    });
+    ChatMessage chatMessage = ChatMessage(
+        senderId: sp?.getStringFromPref(SPKeys.studentId) ?? stringDefault,
+        senderName: sp?.getStringFromPref(SPKeys.name) ?? stringDefault,
+        text: _msgController.text,
+        timestamp: DateTime.now().millisecondsSinceEpoch);
+    // setState(() {
+    //   _messages.add(ChatMessage(
+    //       senderId: sp?.getStringFromPref(SPKeys.studentId) ?? stringDefault,
+    //       senderName: sp?.getStringFromPref(SPKeys.name) ?? stringDefault,
+    //       text: _msgController.text,
+    //       timestamp: DateTime.now().millisecondsSinceEpoch));
+    // });
+    await _db
+        .child('live_rooms/${widget.item.startTime}/messages')
+        .push()
+        .set(chatMessage.toMap());
     _msgController.clear();
   }
 
@@ -227,5 +178,53 @@ class _ClassroomScreenState extends State<ClassroomScreen>
         ),
       ),
     );
+  }
+
+  void _listenToMessages() {
+    _db
+        .child('live_rooms/${widget.item.startTime}/messages')
+        .onValue
+        .listen((event) {
+      final data = event.snapshot.value;
+      if (data == null) {
+        setState(() => _messages = []);
+        return;
+      }
+
+      final Map<dynamic, dynamic> map = data as Map<dynamic, dynamic>;
+      final List<ChatMessage> loaded = map.entries
+          .map((e) => ChatMessage.fromMap(
+                Map<String, dynamic>.from(e.value as Map),
+              ))
+          .toList();
+
+      // Sort by timestamp ascending
+      loaded.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+
+      setState(() => _messages = loaded);
+    });
+  }
+
+  void _listenToParticipants() {
+    _db
+        .child('live_rooms/${widget.item.startTime}/participants')
+        .onValue
+        .listen((event) {
+      final data = event.snapshot.value;
+      if (data == null) {
+        setState(() => _participants = []);
+        return;
+      }
+
+      final Map<dynamic, dynamic> map = data as Map<dynamic, dynamic>;
+      final List<LiveUser> loaded = map.entries
+          .map((e) => LiveUser.fromMap(
+                e.key as String,
+                Map<String, dynamic>.from(e.value as Map),
+              ))
+          .toList();
+
+      setState(() => _participants = loaded);
+    });
   }
 }

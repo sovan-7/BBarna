@@ -1,19 +1,19 @@
 class LiveUser {
   final String uid;
   final String name;
-  final bool online;
+  final bool isOnline;
 
   LiveUser({
     required this.uid,
     required this.name,
-    required this.online,
+    required this.isOnline,
   });
 
   factory LiveUser.fromMap(String uid, Map data) {
     return LiveUser(
       uid: uid,
       name: data['name'] ?? '',
-      online: data['online'] ?? false,
+      isOnline: data['isOnline'] ?? false,
     );
   }
 }

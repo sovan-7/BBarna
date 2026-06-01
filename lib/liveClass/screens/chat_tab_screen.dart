@@ -1,5 +1,8 @@
+import 'package:b_barna_app/core/constants/value_constants.dart';
+import 'package:b_barna_app/liveClass/models/chat_message.dart';
+import 'package:b_barna_app/liveClass/widgets/message_buble.dart';
+import 'package:b_barna_app/utils/helper.dart';
 import 'package:flutter/material.dart';
-import 'live_class_screen.dart' show ChatMessage;
 
 class ChatTabScreen extends StatefulWidget {
   final List<ChatMessage> messages;
@@ -20,9 +23,9 @@ class ChatTabScreen extends StatefulWidget {
 class _ChatTabScreenState extends State<ChatTabScreen> {
   final ScrollController _scrollController = ScrollController();
 
-  static const Color _purple = Color(0xFF534AB7);
   static const Color _border = Color(0xFFE5E5EA);
   static const Color _bgGrey = Color(0xFFF5F6FA);
+  AvatarColors colors = Helper().getRandomAvatarColors();
 
   @override
   void didUpdateWidget(ChatTabScreen old) {
@@ -54,7 +57,10 @@ class _ChatTabScreenState extends State<ChatTabScreen> {
             padding: const EdgeInsets.all(12),
             itemCount: widget.messages.length,
             separatorBuilder: (_, __) => const SizedBox(height: 10),
-            itemBuilder: (_, i) => _MessageBubble(msg: widget.messages[i]),
+            itemBuilder: (_, i) => MessageBubble(
+              msg: widget.messages[i],
+              avatarColors: colors,
+            ),
           ),
         ),
         Container(
@@ -105,120 +111,6 @@ class _ChatTabScreenState extends State<ChatTabScreen> {
               ),
             ],
           ),
-        ),
-      ],
-    );
-  }
-}
-
-class _MessageBubble extends StatelessWidget {
-  final ChatMessage msg;
-
-  const _MessageBubble({required this.msg});
-
-  @override
-  Widget build(BuildContext context) {
-    if (msg.isMe) {
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Container(
-                constraints: BoxConstraints(
-                    maxWidth: MediaQuery.of(context).size.width * 0.62),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF09636E).withValues(alpha: 0.05),
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(14),
-                    topRight: Radius.circular(3),
-                    bottomLeft: Radius.circular(14),
-                    bottomRight: Radius.circular(14),
-                  ),
-                  border: Border.all(
-                      color: const Color(0xFF09636E).withValues(alpha: 0.3),
-                      width: 0.5),
-                ),
-                child: Text(msg.text,
-                    style: const TextStyle(
-                        fontSize: 12, color: Color(0xFF1C1C1E))),
-              ),
-              const SizedBox(height: 3),
-              Text(msg.time,
-                  style: TextStyle(
-                      fontSize: 9, color: Colors.black.withValues(alpha: 0.7))),
-            ],
-          ),
-          const SizedBox(width: 6),
-          Container(
-            width: 28,
-            height: 28,
-            decoration:
-                BoxDecoration(color: msg.avatarBg, shape: BoxShape.circle),
-            child: Center(
-              child: Text(msg.initials,
-                  style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: msg.avatarFg)),
-            ),
-          )
-        ],
-      );
-    }
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 28,
-          height: 28,
-          decoration:
-              BoxDecoration(color: msg.avatarBg, shape: BoxShape.circle),
-          child: Center(
-            child: Text(msg.initials,
-                style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: msg.avatarFg)),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(msg.name,
-                style: const TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF534AB7))),
-            const SizedBox(height: 3),
-            Container(
-              constraints: BoxConstraints(
-                  maxWidth: MediaQuery.of(context).size.width * 0.62),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(3),
-                  topRight: Radius.circular(14),
-                  bottomLeft: Radius.circular(14),
-                  bottomRight: Radius.circular(14),
-                ),
-                border: Border.all(color: const Color(0xFFE5E5EA), width: 0.5),
-              ),
-              child: Text(msg.text,
-                  style:
-                      const TextStyle(fontSize: 12, color: Color(0xFF1C1C1E))),
-            ),
-            const SizedBox(height: 3),
-            Text(msg.time,
-                style: TextStyle(
-                    fontSize: 9, color: Colors.black.withValues(alpha: 0.7))),
-          ],
         ),
       ],
     );
