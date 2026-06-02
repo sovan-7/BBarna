@@ -57,6 +57,7 @@ class _ClassroomScreenState extends State<ClassroomScreen>
     );
     _tabController = TabController(length: 2, vsync: this);
     _listenToMessages();
+    _listenToParticipants();
   }
 
   @override
@@ -169,7 +170,7 @@ class _ClassroomScreenState extends State<ClassroomScreen>
                       controller: _msgController,
                       onSend: _sendMessage,
                     ),
-                    const PeopleTabScreen(),
+                     PeopleTabScreen(liveUser: [], teacher: [],),
                   ],
                 ),
               ),
