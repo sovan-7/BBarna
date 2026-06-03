@@ -1,5 +1,7 @@
 import 'package:b_barna_app/core/constants/value_constants.dart';
 import 'package:b_barna_app/liveClass/models/chat_message.dart';
+import 'package:b_barna_app/liveClass/models/live_user.dart';
+import 'package:b_barna_app/liveClass/widgets/mention_widget.dart';
 import 'package:b_barna_app/liveClass/widgets/message_buble.dart';
 import 'package:b_barna_app/utils/helper.dart';
 import 'package:flutter/material.dart';
@@ -8,12 +10,14 @@ class ChatTabScreen extends StatefulWidget {
   final List<ChatMessage> messages;
   final TextEditingController controller;
   final VoidCallback onSend;
+  List<LiveUser>liveUsersList=[];
 
-  const ChatTabScreen({
+   ChatTabScreen({
     super.key,
     required this.messages,
     required this.controller,
     required this.onSend,
+    required this.liveUsersList
   });
 
   @override
@@ -78,21 +82,26 @@ class _ChatTabScreenState extends State<ChatTabScreen> {
                     border: Border.all(
                         color: Colors.grey.withValues(alpha: 0.6), width: 0.5),
                   ),
-                  child: TextField(
+                  child: MentionInputWidget(
                     controller: widget.controller,
-                    cursorColor: Color(0xFF09636E),
-                    style: const TextStyle(fontSize: 13),
-                    decoration: InputDecoration(
-                      hintText: 'Type a message…',
-                      hintStyle: TextStyle(
-                          color: Colors.black.withValues(alpha: 0.6),
-                          fontSize: 13),
-                      border: InputBorder.none,
-                      contentPadding:
-                          EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-                    ),
-                    onSubmitted: (_) => widget.onSend(),
+                    onSend: widget.onSend,
+                    users:widget. liveUsersList,
                   ),
+                  // TextField(
+                  //   controller: widget.controller,
+                  //   cursorColor: Color(0xFF09636E),
+                  //   style: const TextStyle(fontSize: 13),
+                  //   decoration: InputDecoration(
+                  //     hintText: 'Type a message…',
+                  //     hintStyle: TextStyle(
+                  //         color: Colors.black.withValues(alpha: 0.6),
+                  //         fontSize: 13),
+                  //     border: InputBorder.none,
+                  //     contentPadding:
+                  //         EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                  //   ),
+                  //   onSubmitted: (_) => widget.onSend(),
+                  // ),
                 ),
               ),
               const SizedBox(width: 8),

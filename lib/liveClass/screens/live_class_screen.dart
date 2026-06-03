@@ -171,6 +171,7 @@ class _ClassroomScreenState extends State<ClassroomScreen>
                       messages: _messages,
                       controller: _msgController,
                       onSend: _sendMessage,
+                      liveUsersList: _participants,
                     ),
                     PeopleTabScreen(
                       liveUser: _participants,
