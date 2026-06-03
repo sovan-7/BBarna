@@ -36,13 +36,13 @@ class _ClassroomScreenState extends State<ClassroomScreen>
 
   List<ChatMessage> _messages = [];
   List<LiveUser> _participants = [];
+  List<LiveUser> teacherList = [];
 
   @override
   void initState() {
     super.initState();
     String videoId =
         YoutubePlayer.convertUrlToId(widget.item.youtubeVideoLink)!;
-
     youtubePlayerController = YoutubePlayerController(
       initialVideoId: videoId,
       flags: const YoutubePlayerFlags(
@@ -58,10 +58,12 @@ class _ClassroomScreenState extends State<ClassroomScreen>
     _tabController = TabController(length: 2, vsync: this);
     _listenToMessages();
     _listenToParticipants();
+    updateParticipantStatus();
   }
 
   @override
   void dispose() {
+    updateParticipantStatus(isOnline: false);
     _tabController.dispose();
     _msgController.dispose();
     super.dispose();
@@ -170,7 +172,10 @@ class _ClassroomScreenState extends State<ClassroomScreen>
                       controller: _msgController,
                       onSend: _sendMessage,
                     ),
-                     PeopleTabScreen(liveUser: [], teacher: [],),
+                    PeopleTabScreen(
+                      liveUser: _participants,
+                      teacher: teacherList,
+                    ),
                   ],
                 ),
               ),
@@ -187,6 +192,8 @@ class _ClassroomScreenState extends State<ClassroomScreen>
         .onValue
         .listen((event) {
       final data = event.snapshot.value;
+      if (!mounted) return;
+
       if (data == null) {
         setState(() => _messages = []);
         return;
@@ -201,6 +208,7 @@ class _ClassroomScreenState extends State<ClassroomScreen>
 
       // Sort by timestamp ascending
       loaded.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+      if (!mounted) return;
 
       setState(() => _messages = loaded);
     });
@@ -212,6 +220,8 @@ class _ClassroomScreenState extends State<ClassroomScreen>
         .onValue
         .listen((event) {
       final data = event.snapshot.value;
+      if (!mounted) return;
+
       if (data == null) {
         setState(() => _participants = []);
         return;
@@ -224,8 +234,46 @@ class _ClassroomScreenState extends State<ClassroomScreen>
                 Map<String, dynamic>.from(e.value as Map),
               ))
           .toList();
+      if (!mounted) return;
 
-      setState(() => _participants = loaded);
+      setState(() {
+        _participants = loaded;
+
+        int index = _participants
+            .indexWhere((user) => user.uid == widget.item.teacherId);
+        if (index != -1) {
+          LiveUser user = _participants[index];
+          _participants.removeAt(index);
+          teacherList.clear();
+          teacherList.add(user);
+        }
+      });
     });
+  }
+
+  Future<void> updateParticipantStatus({bool isOnline = true}) async {
+    String userId = sp?.getStringFromPref(SPKeys.studentId) ?? stringDefault;
+    String name = sp?.getStringFromPref(SPKeys.name) ?? stringDefault;
+    final participantRef = FirebaseDatabase.instance
+        .ref('live_rooms/${widget.item.startTime}/participants/$userId');
+
+    try {
+      final snapshot = await participantRef.get();
+
+      if (snapshot.exists) {
+        await participantRef.update({'isOnline': isOnline});
+      } else {
+        await participantRef.set({
+          'userId': userId,
+          'name': name,
+          'isOnline': isOnline,
+        });
+      }
+
+      debugPrint('Participant status updated successfully');
+    } catch (e) {
+      debugPrint('Error updating participant: $e');
+      rethrow;
+    }
   }
 }

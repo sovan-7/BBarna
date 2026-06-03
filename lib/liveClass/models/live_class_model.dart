@@ -7,6 +7,7 @@ class LiveClassModel {
   final String title;
   final String subtitle;
   final String teacherName;
+  final String teacherId;
   final int startTime;
   final int endTime;
   final String youtubeVideoLink;
@@ -18,6 +19,7 @@ class LiveClassModel {
     required this.title,
     required this.subtitle,
     required this.teacherName,
+    required this.teacherId,
     required this.startTime,
     required this.endTime,
     required this.youtubeVideoLink,
@@ -34,6 +36,7 @@ class LiveClassModel {
       title: map['title'] ?? stringDefault,
       subtitle: map['subtitle'] ?? stringDefault,
       teacherName: map['teacherName'] ?? stringDefault,
+      teacherId:map['teacherId'] ?? stringDefault ,
       startTime: map['startTime'] ?? 0,
       endTime: map['endTime'] ?? 0,
       youtubeVideoLink: map['youtubeVideoLink'] ?? stringDefault,
@@ -47,6 +50,7 @@ class LiveClassModel {
       'title': title,
       'subtitle': subtitle,
       'teacherName': teacherName,
+      'teacherId': teacherId,
       'startTime': startTime,
       'endTime': endTime,
       'youtubeVideoLink': youtubeVideoLink,

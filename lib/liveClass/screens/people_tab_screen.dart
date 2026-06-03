@@ -2,20 +2,26 @@ import 'package:b_barna_app/core/constants/value_constants.dart';
 import 'package:b_barna_app/liveClass/models/live_user.dart';
 import 'package:b_barna_app/utils/helper.dart';
 import 'package:flutter/material.dart';
-enum StudentStatus { teacher, online, handRaised }
 
+enum StudentStatus { teacher, online, handRaised }
 
 class PeopleTabScreen extends StatefulWidget {
   List<LiveUser> liveUser;
   List<LiveUser> teacher;
-   PeopleTabScreen({ required this.liveUser,required this.teacher,super.key});
+  PeopleTabScreen({required this.liveUser, required this.teacher, super.key});
 
   @override
   State<PeopleTabScreen> createState() => _PeopleTabScreenState();
 }
 
 class _PeopleTabScreenState extends State<PeopleTabScreen> {
-  AvatarColors avatarColors= Helper().getRandomAvatarColors();
+  AvatarColors avatarColors = Helper().getRandomAvatarColors();
+  int onlineCount = 0;
+  @override
+  void initState() {
+    super.initState();
+    onlineCount = widget.liveUser.where((user) => user.isOnline).length;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,11 +38,15 @@ class _PeopleTabScreenState extends State<PeopleTabScreen> {
                   fontWeight: FontWeight.w500)),
         ),
         const SizedBox(height: 6),
-        PeopleCard(students: widget.teacher,avatarColors: avatarColors,role: "Teacher",),
+        PeopleCard(
+          students: widget.teacher,
+          avatarColors: avatarColors,
+          role: "Teacher",
+        ),
         const SizedBox(height: 14),
         Padding(
           padding: const EdgeInsets.only(left: 2),
-          child: Text('Students — ${1 + 24} online'.toUpperCase(),
+          child: Text('Students — $onlineCount online'.toUpperCase(),
               style: const TextStyle(
                   fontSize: 10,
                   color: Color(0xFF8E8E93),
@@ -54,17 +64,15 @@ class _PeopleTabScreenState extends State<PeopleTabScreen> {
   }
 }
 
-
-
 class PeopleCard extends StatelessWidget {
   final List<LiveUser> students;
- final AvatarColors avatarColors;
- final String role;
-  const PeopleCard({
-    required this.students,
-    required this.avatarColors,
-    required this.role
-  });
+  final AvatarColors avatarColors;
+  final String role;
+  const PeopleCard(
+      {super.key,
+      required this.students,
+      required this.avatarColors,
+      required this.role});
 
   @override
   Widget build(BuildContext context) {
@@ -77,10 +85,14 @@ class PeopleCard extends StatelessWidget {
       child: Column(
         children: [
           ...students.asMap().entries.map((e) {
-            final isLast = e.key == students.length - 1 ;
-            return StudentRow(liveUser: e.value, showDivider: !isLast,avatarColors: avatarColors, role: role,);
+            final isLast = e.key == students.length - 1;
+            return StudentRow(
+              liveUser: e.value,
+              showDivider: !isLast,
+              avatarColors: avatarColors,
+              role: role,
+            );
           }),
-
         ],
       ),
     );
@@ -93,7 +105,12 @@ class StudentRow extends StatelessWidget {
   final AvatarColors avatarColors;
   final String role;
 
-  const StudentRow({required this.liveUser, required this.showDivider,required this.avatarColors,required this.role});
+  const StudentRow(
+      {super.key,
+      required this.liveUser,
+      required this.showDivider,
+      required this.avatarColors,
+      required this.role});
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -104,10 +121,11 @@ class StudentRow extends StatelessWidget {
             children: [
               Container(
                 width: 34,
-                height: 11,
-                decoration: BoxDecoration(color: avatarColors.bg, shape: BoxShape.circle),
+                height: 34,
+                decoration: BoxDecoration(
+                    color: avatarColors.bg, shape: BoxShape.circle),
                 child: Center(
-                  child: Text(Helper.nameToInitials(liveUser.name) ,
+                  child: Text(Helper.nameToInitials(liveUser.name),
                       style: TextStyle(
                           fontSize: 8,
                           fontWeight: FontWeight.w600,
@@ -133,12 +151,17 @@ class StudentRow extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: Color(0xFFE1F5EE),
+                  color:
+                      liveUser.isOnline ? Color(0xFFE1F5EE) : Color(0xFFFAEEDA),
                   borderRadius: BorderRadius.circular(5),
                 ),
-                child: Text(liveUser.isOnline? "Online":"Offline",
+                child: Text(liveUser.isOnline ? "Online" : "Offline",
                     style: TextStyle(
-                        fontSize: 10, fontWeight: FontWeight.w500, color: Color(0xFF085041))),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w500,
+                        color: liveUser.isOnline
+                            ? Color(0xFF085041)
+                            : Color(0xFF633806))),
               )
             ],
           ),
@@ -158,5 +181,3 @@ class StudentRow extends StatelessWidget {
 // fg: const Color(0xFF3C3489));
 // bg: const Color(0xFFFAEEDA),
 // fg: const Color(0xFF633806),
-
-
