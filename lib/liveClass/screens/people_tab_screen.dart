@@ -12,7 +12,11 @@ class PeopleTabScreen extends StatefulWidget {
   List<LiveUser> liveUser;
   List<LiveUser> teacher;
   String teacherId;
-  PeopleTabScreen({required this.liveUser, required this.teacher,required this.teacherId, super.key});
+  PeopleTabScreen(
+      {required this.liveUser,
+      required this.teacher,
+      required this.teacherId,
+      super.key});
 
   @override
   State<PeopleTabScreen> createState() => _PeopleTabScreenState();
@@ -64,7 +68,8 @@ class _PeopleTabScreenState extends State<PeopleTabScreen> {
           students: widget.liveUser,
           avatarColors: avatarColors,
           role: "Student",
-          isTeacher: sp?.getStringFromPref(SPKeys.studentId)==widget.teacherId, // Teacher can moderate students
+          isTeacher: sp?.getStringFromPref(SPKeys.studentId) ==
+              widget.teacherId, // Teacher can moderate students
         ),
       ],
     );
@@ -278,7 +283,7 @@ class _StudentActionSheet extends StatelessWidget {
                 confirmColor: const Color(0xFFFF9500),
                 onConfirm: () {
                   livClassVM.updateParticipantStatus(
-                      liveUser.uid, ParticipantAction.isBlock);
+                      liveUser.uid, ParticipantAction.isWarned);
                 },
               );
             },
@@ -294,6 +299,8 @@ class _StudentActionSheet extends StatelessWidget {
             label: 'Delete Message',
             iconColor: const Color(0xFFFF3B30),
             onTap: () {
+              LiveClassViewModel livClassVM =
+                  Provider.of<LiveClassViewModel>(context, listen: false);
               Navigator.pop(context);
               _showConfirmDialog(
                 context: context,
@@ -303,7 +310,8 @@ class _StudentActionSheet extends StatelessWidget {
                 confirmLabel: 'Delete',
                 confirmColor: const Color(0xFFFF3B30),
                 onConfirm: () {
-                  // TODO: handle delete message
+                  livClassVM.updateParticipantStatus(
+                      liveUser.uid, ParticipantAction.isDelete);
                 },
               );
             },
@@ -319,6 +327,8 @@ class _StudentActionSheet extends StatelessWidget {
             label: 'Block',
             iconColor: const Color(0xFFFF3B30),
             onTap: () {
+              LiveClassViewModel livClassVM =
+                  Provider.of<LiveClassViewModel>(context, listen: false);
               Navigator.pop(context);
               _showConfirmDialog(
                 context: context,
@@ -328,7 +338,8 @@ class _StudentActionSheet extends StatelessWidget {
                 confirmLabel: 'Block',
                 confirmColor: const Color(0xFFFF3B30),
                 onConfirm: () {
-                  // TODO: handle block
+                  livClassVM.updateParticipantStatus(
+                      liveUser.uid, ParticipantAction.isBlock);
                 },
               );
             },
