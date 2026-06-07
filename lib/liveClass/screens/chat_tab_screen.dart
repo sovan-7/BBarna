@@ -55,30 +55,101 @@ class _ChatTabScreenState extends State<ChatTabScreen> {
     super.dispose();
   }
 
+  /// Shows a bottom sheet with a Delete option on long-press.
+  void _showMessageOptions(BuildContext context, ChatMessage msg) {
+    final vm = context.read<LiveClassViewModel>();
+
+    // Only allow deleting own messages (adjust field name to match your model)
+    if (!vm.isMyMessage(msg)) return;
+
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Drag handle
+            Container(
+              margin: const EdgeInsets.only(top: 8, bottom: 4),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete_outline, color: Colors.red),
+              title: const Text(
+                'Delete Message',
+                style: TextStyle(color: Colors.red),
+              ),
+              onTap: () {
+                Navigator.pop(context);
+                _confirmDelete(context, msg);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.close),
+              title: const Text('Cancel'),
+              onTap: () => Navigator.pop(context),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Shows a confirmation dialog before deleting.
+  void _confirmDelete(BuildContext context, ChatMessage msg) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Message'),
+        content: const Text('Are you sure you want to delete this message?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              context.read<LiveClassViewModel>().deleteMessage(msg);
+            },
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    // ✅ context.watch — rebuilds this widget whenever notifyListeners() is called
-    final isBlocked = context
-        .watch<LiveClassViewModel>()
-        .isBlockedMe(widget.liveUsersList);
-    final isWarned = context
-        .watch<LiveClassViewModel>()
-        .isWarnedMe(widget.liveUsersList);
-    return Container(
-        decoration: BoxDecoration(
+    final isBlocked =
+    context.watch<LiveClassViewModel>().isBlockedMe(widget.liveUsersList);
+    final isWarned =
+    context.watch<LiveClassViewModel>().isWarnedMe(widget.liveUsersList);
 
+    return Container(
+      decoration: isBlocked || isWarned
+          ? BoxDecoration(
         image: DecorationImage(
-        image: AssetImage(
-          isBlocked
-              ? 'assets/images/png/block_bg.png'
-              : isWarned
-              ? 'assets/images/png/warn_bg.png'
-              : '',
+          image: AssetImage(
+            isBlocked
+                ? 'assets/images/png/block_bg.png'
+                : 'assets/images/png/warn_bg.png',
+          ),
+          fit: BoxFit.fill,
+          opacity: 0.35,
         ),
-        fit: BoxFit.fill,
-        opacity: 0.35, // subtle watermark effect
-      ),
-        ),
+      )
+          : null,
       child: Column(
         children: [
           Expanded(
@@ -87,9 +158,13 @@ class _ChatTabScreenState extends State<ChatTabScreen> {
               padding: const EdgeInsets.all(12),
               itemCount: widget.messages.length,
               separatorBuilder: (_, __) => const SizedBox(height: 10),
-              itemBuilder: (_, i) => MessageBubble(
-                msg: widget.messages[i],
-                avatarColors: colors,
+              itemBuilder: (_, i) => GestureDetector(
+                onLongPress: () =>
+                    _showMessageOptions(context, widget.messages[i]),
+                child: MessageBubble(
+                  msg: widget.messages[i],
+                  avatarColors: colors,
+                ),
               ),
             ),
           ),

@@ -165,7 +165,7 @@ class _ClassroomScreenState extends State<ClassroomScreen>
       final Map<dynamic, dynamic> map = data as Map<dynamic, dynamic>;
       final List<ChatMessage> loaded = map.entries
           .map((e) => ChatMessage.fromMap(
-        Map<String, dynamic>.from(e.value as Map),
+        Map<String, dynamic>.from(e.value as Map),e.key.toString()
       ))
           .toList()
         ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
@@ -254,6 +254,7 @@ class _ClassroomScreenState extends State<ClassroomScreen>
       senderName: sp?.getStringFromPref(SPKeys.name) ?? stringDefault,
       text: _msgController.text,
       timestamp: DateTime.now().millisecondsSinceEpoch,
+      msgId:DateTime.now().millisecondsSinceEpoch.toString()
     );
 
     await _db

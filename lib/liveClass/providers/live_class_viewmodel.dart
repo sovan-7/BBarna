@@ -1,5 +1,6 @@
 import 'package:b_barna_app/core/constants/value_constants.dart';
 import 'package:b_barna_app/core/widgets/loader_dialog.dart';
+import 'package:b_barna_app/liveClass/models/chat_message.dart';
 import 'package:b_barna_app/liveClass/models/live_class_model.dart';
 import 'package:b_barna_app/utils/sp_keys.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -17,9 +18,9 @@ class LiveClassViewModel extends ChangeNotifier {
   String liveClassId = stringDefault;
 
   List<LiveClassModel> get liveClasses => _allClasses.where((c) {
-    final now = DateTime.now().millisecondsSinceEpoch;
-    return c.startTime <= now && now <= c.endTime;
-  }).toList();
+        final now = DateTime.now().millisecondsSinceEpoch;
+        return c.startTime <= now && now <= c.endTime;
+      }).toList();
 
   List<LiveClassModel> get upcomingClasses => _allClasses
       .where((c) => c.startTime > DateTime.now().millisecondsSinceEpoch)
@@ -136,9 +137,20 @@ class LiveClassViewModel extends ChangeNotifier {
   }
 
   String _month(int m) => const [
-    '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-  ][m];
+        '',
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec'
+      ][m];
 
   String getButtonStatus(LiveClassModel c, String classStatus) {
     if (classStatus == "upcoming") return formatDateLabel(c);
@@ -162,7 +174,8 @@ class LiveClassViewModel extends ChangeNotifier {
             await participantRef.update({'isWarned': true});
             break;
           case ParticipantAction.isDelete:
-            await participantRef.remove();
+            deleteAllMessagesOfUser(studentId);
+
             break;
         }
       }
@@ -173,10 +186,55 @@ class LiveClassViewModel extends ChangeNotifier {
 
   bool isBlockedMe(List<LiveUser> liveUserList) {
     return liveUserList.any((user) =>
-    user.uid == sp?.getStringFromPref(SPKeys.studentId) && user.isBlock);
+        user.uid == sp?.getStringFromPref(SPKeys.studentId) && user.isBlock);
   }
+
   bool isWarnedMe(List<LiveUser> liveUserList) {
     return liveUserList.any((user) =>
-    user.uid == sp?.getStringFromPref(SPKeys.studentId) && user.isWarned);
+        user.uid == sp?.getStringFromPref(SPKeys.studentId) && user.isWarned);
+  }
+
+  bool isMyMessage(ChatMessage msg) {
+    return msg.senderId == sp?.getStringFromPref(SPKeys.studentId);
+  }
+
+  void deleteMessage(ChatMessage msg) async {
+    try {
+      final messagesRef =
+          FirebaseDatabase.instance.ref('live_rooms/$liveClassId/messages');
+
+      await messagesRef.child(msg.msgId).remove();
+    } catch (e) {
+      debugPrint('Error deleting message: $e');
+    }
+  }
+
+  void deleteAllMessagesOfUser(String senderId) async {
+    try {
+      final messagesRef =
+          FirebaseDatabase.instance.ref('live_rooms/$liveClassId/messages');
+
+      final snapshot = await messagesRef.get();
+
+      if (snapshot.exists) {
+        final data = Map<String, dynamic>.from(snapshot.value as Map);
+        final Map<String, Null> updates = {};
+        data.forEach((key, value) {
+          final msgData = Map<String, dynamic>.from(value);
+          if (msgData['senderId'] == senderId) {
+            updates[key] = null;
+          }
+        });
+
+        // Delete all matched messages in one batch call
+        if (updates.isNotEmpty) {
+          await messagesRef.update(updates);
+        }
+      }
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error deleting messages: $e');
+    }
   }
 }

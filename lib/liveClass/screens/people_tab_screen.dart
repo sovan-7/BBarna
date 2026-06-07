@@ -306,7 +306,7 @@ class _StudentActionSheet extends StatelessWidget {
                 context: context,
                 title: 'Delete message?',
                 message:
-                    'The last message from ${liveUser.name} will be removed for everyone.',
+                    'All messages from ${liveUser.name} will be removed for everyone.',
                 confirmLabel: 'Delete',
                 confirmColor: const Color(0xFFFF3B30),
                 onConfirm: () {
