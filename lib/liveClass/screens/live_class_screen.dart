@@ -235,6 +235,8 @@ class _ClassroomScreenState extends State<ClassroomScreen>
           'userId': userId,
           'name': name,
           'isOnline': isOnline,
+          "isWarned":false,
+          "isBlock":false
         });
       }
     } catch (e) {

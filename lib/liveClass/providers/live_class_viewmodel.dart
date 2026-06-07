@@ -175,4 +175,8 @@ class LiveClassViewModel extends ChangeNotifier {
     return liveUserList.any((user) =>
     user.uid == sp?.getStringFromPref(SPKeys.studentId) && user.isBlock);
   }
+  bool isWarnedMe(List<LiveUser> liveUserList) {
+    return liveUserList.any((user) =>
+    user.uid == sp?.getStringFromPref(SPKeys.studentId) && user.isWarned);
+  }
 }

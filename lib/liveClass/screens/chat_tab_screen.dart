@@ -61,67 +61,85 @@ class _ChatTabScreenState extends State<ChatTabScreen> {
     final isBlocked = context
         .watch<LiveClassViewModel>()
         .isBlockedMe(widget.liveUsersList);
+    final isWarned = context
+        .watch<LiveClassViewModel>()
+        .isWarnedMe(widget.liveUsersList);
+    return Container(
+        decoration: BoxDecoration(
 
-    return Column(
-      children: [
-        Expanded(
-          child: ListView.separated(
-            controller: _scrollController,
-            padding: const EdgeInsets.all(12),
-            itemCount: widget.messages.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
-            itemBuilder: (_, i) => MessageBubble(
-              msg: widget.messages[i],
-              avatarColors: colors,
+        image: DecorationImage(
+        image: AssetImage(
+          isBlocked
+              ? 'assets/images/png/block_bg.png'
+              : isWarned
+              ? 'assets/images/png/warn_bg.png'
+              : '',
+        ),
+        fit: BoxFit.fill,
+        opacity: 0.35, // subtle watermark effect
+      ),
+        ),
+      child: Column(
+        children: [
+          Expanded(
+            child: ListView.separated(
+              controller: _scrollController,
+              padding: const EdgeInsets.all(12),
+              itemCount: widget.messages.length,
+              separatorBuilder: (_, __) => const SizedBox(height: 10),
+              itemBuilder: (_, i) => MessageBubble(
+                msg: widget.messages[i],
+                avatarColors: colors,
+              ),
             ),
           ),
-        ),
-        if (!isBlocked)
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: const BoxDecoration(
-              border: Border(top: BorderSide(color: _border, width: 0.5)),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: _bgGrey,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: Colors.grey.withValues(alpha: 0.6),
-                        width: 0.5,
+          if (!isBlocked)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: const BoxDecoration(
+                border: Border(top: BorderSide(color: _border, width: 0.5)),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: _bgGrey,
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: Colors.grey.withValues(alpha: 0.6),
+                          width: 0.5,
+                        ),
+                      ),
+                      child: MentionInputWidget(
+                        controller: widget.controller,
+                        onSend: widget.onSend,
+                        users: widget.liveUsersList,
                       ),
                     ),
-                    child: MentionInputWidget(
-                      controller: widget.controller,
-                      onSend: widget.onSend,
-                      users: widget.liveUsersList,
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: widget.onSend,
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF09636E),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.send_rounded,
+                        color: Colors.white,
+                        size: 16,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                GestureDetector(
-                  onTap: widget.onSend,
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF09636E),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.send_rounded,
-                      color: Colors.white,
-                      size: 16,
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 }
