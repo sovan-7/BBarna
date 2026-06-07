@@ -1,5 +1,6 @@
 import 'package:b_barna_app/liveClass/providers/live_class_viewmodel.dart';
 import 'package:b_barna_app/pushNotification/push_notification_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:b_barna_app/audio/viewModel/audio_viewmodel.dart';
@@ -25,14 +26,15 @@ import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   sp = SharedPrefOperations.getInstance;
   sp?.init();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  // 🔥 VERY IMPORTANT — register here
   FirebaseMessaging.onBackgroundMessage(
       firebaseMessagingBackgroundHandler);
+
   await PushNotificationService().init();
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (_) => LiveClassViewModel()),

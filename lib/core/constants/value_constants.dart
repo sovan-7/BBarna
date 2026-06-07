@@ -45,3 +45,8 @@ const List<Color> avatarFgColors = [
   Color(0xFF0C447C),
 ];
 typedef AvatarColors = ({Color bg, Color fg});
+enum ParticipantAction {
+  isBlock,
+  isWarned,
+  isDelete,
+}

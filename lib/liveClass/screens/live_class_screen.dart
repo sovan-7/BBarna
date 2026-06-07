@@ -2,10 +2,12 @@ import 'package:b_barna_app/core/constants/value_constants.dart';
 import 'package:b_barna_app/liveClass/models/chat_message.dart';
 import 'package:b_barna_app/liveClass/models/live_class_model.dart';
 import 'package:b_barna_app/liveClass/models/live_user.dart';
+import 'package:b_barna_app/liveClass/providers/live_class_viewmodel.dart';
 import 'package:b_barna_app/textSize/text_view_bold.dart';
 import 'package:b_barna_app/utils/sp_keys.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'video_player_screen.dart';
 import 'chat_tab_screen.dart';
@@ -36,20 +38,19 @@ class _ClassroomScreenState extends State<ClassroomScreen>
 
   List<ChatMessage> _messages = [];
   List<LiveUser> _participants = [];
-  List<LiveUser> teacherList = [];
+  List<LiveUser> _teacherList = []; // ✅ renamed & kept in state
 
   @override
   void initState() {
     super.initState();
+
     String videoId =
-        YoutubePlayer.convertUrlToId(widget.item.youtubeVideoLink)!;
+    YoutubePlayer.convertUrlToId(widget.item.youtubeVideoLink)!;
     youtubePlayerController = YoutubePlayerController(
       initialVideoId: videoId,
       flags: const YoutubePlayerFlags(
         autoPlay: false,
         mute: false,
-        // forceHD: true,
-        // loop: true,
         controlsVisibleAtStart: true,
         hideThumbnail: true,
         enableCaption: false,
@@ -59,6 +60,8 @@ class _ClassroomScreenState extends State<ClassroomScreen>
     _listenToMessages();
     _listenToParticipants();
     updateParticipantStatus();
+    Provider.of<LiveClassViewModel>(context, listen: false)
+        .storeLiveClassId(widget.item.startTime.toString());
   }
 
   @override
@@ -69,38 +72,15 @@ class _ClassroomScreenState extends State<ClassroomScreen>
     super.dispose();
   }
 
-  void _sendMessage() async {
-    final text = _msgController.text.trim();
-    if (text.isEmpty) return;
-    ChatMessage chatMessage = ChatMessage(
-        senderId: sp?.getStringFromPref(SPKeys.studentId) ?? stringDefault,
-        senderName: sp?.getStringFromPref(SPKeys.name) ?? stringDefault,
-        text: _msgController.text,
-        timestamp: DateTime.now().millisecondsSinceEpoch);
-    // setState(() {
-    //   _messages.add(ChatMessage(
-    //       senderId: sp?.getStringFromPref(SPKeys.studentId) ?? stringDefault,
-    //       senderName: sp?.getStringFromPref(SPKeys.name) ?? stringDefault,
-    //       text: _msgController.text,
-    //       timestamp: DateTime.now().millisecondsSinceEpoch));
-    // });
-    await _db
-        .child('live_rooms/${widget.item.startTime}/messages')
-        .push()
-        .set(chatMessage.toMap());
-    _msgController.clear();
-  }
-
   @override
   Widget build(BuildContext context) {
+    final List<LiveUser> allUsers = [..._participants, ..._teacherList];
     return Scaffold(
       backgroundColor: _bgGrey,
       appBar: AppBar(
-        backgroundColor: Color(0xFF09636E),
+        backgroundColor: const Color(0xFF09636E),
         leading: InkWell(
-          onTap: () {
-            Navigator.pop(context);
-          },
+          onTap: () => Navigator.pop(context),
           child: const Icon(
             Icons.arrow_back_ios_new,
             size: 25,
@@ -108,29 +88,10 @@ class _ClassroomScreenState extends State<ClassroomScreen>
           ),
         ),
         title: TextViewBold(
-            textContent: "NET Bengali".toUpperCase(), textSizeNumber: 17),
+          textContent: widget.item.subject.toUpperCase(),
+          textSizeNumber: 17,
+        ),
         centerTitle: true,
-        // actions: [
-        //   Container(
-        //     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-        //     decoration: BoxDecoration(
-        //       color: const Color(0xFFFCEBEB),
-        //       borderRadius: BorderRadius.circular(5),
-        //     ),
-        //     child: Row(
-        //       mainAxisSize: MainAxisSize.min,
-        //       children: const [
-        //         Icon(Icons.circle, size: 7, color: Color(0xFFA32D2D)),
-        //         SizedBox(width: 4),
-        //         Text('LIVE',
-        //             style: TextStyle(
-        //                 fontSize: 10,
-        //                 fontWeight: FontWeight.w600,
-        //                 color: Color(0xFFA32D2D))),
-        //       ],
-        //     ),
-        //   ),
-        // ],
       ),
       body: SafeArea(
         child: VideoPlayerScreen(
@@ -140,23 +101,23 @@ class _ClassroomScreenState extends State<ClassroomScreen>
             children: [
               TabBar(
                 controller: _tabController,
-                labelColor: Color(0xFF09636E),
+                labelColor: const Color(0xFF09636E),
                 unselectedLabelColor: Colors.black.withValues(alpha: 0.6),
-                labelStyle:
-                    const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
-                unselectedLabelStyle:
-                    const TextStyle(fontSize: 13, fontWeight: FontWeight.w400),
-                indicatorColor: Color(0xFF09636E),
+                labelStyle: const TextStyle(
+                    fontSize: 13, fontWeight: FontWeight.w600),
+                unselectedLabelStyle: const TextStyle(
+                    fontSize: 13, fontWeight: FontWeight.w400),
+                indicatorColor: const Color(0xFF09636E),
                 indicatorWeight: 2,
                 indicatorSize: TabBarIndicatorSize.label,
                 tabs: List.generate(
                   iconList.length,
-                  (index) => Tab(
+                      (index) => Tab(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(iconList[index], size: 15),
-                        SizedBox(width: 5),
+                        const SizedBox(width: 5),
                         Text(tabTitleList[index]),
                       ],
                     ),
@@ -171,11 +132,12 @@ class _ClassroomScreenState extends State<ClassroomScreen>
                       messages: _messages,
                       controller: _msgController,
                       onSend: _sendMessage,
-                      liveUsersList: _participants,
+                      liveUsersList: allUsers, // ✅ always fresh combined list
                     ),
                     PeopleTabScreen(
                       liveUser: _participants,
-                      teacher: teacherList,
+                      teacher: _teacherList, // ✅ reassigned state variable
+                      teacherId: widget.item.teacherId,
                     ),
                   ],
                 ),
@@ -203,14 +165,12 @@ class _ClassroomScreenState extends State<ClassroomScreen>
       final Map<dynamic, dynamic> map = data as Map<dynamic, dynamic>;
       final List<ChatMessage> loaded = map.entries
           .map((e) => ChatMessage.fromMap(
-                Map<String, dynamic>.from(e.value as Map),
-              ))
-          .toList();
+        Map<String, dynamic>.from(e.value as Map),
+      ))
+          .toList()
+        ..sort((a, b) => a.timestamp.compareTo(b.timestamp));
 
-      // Sort by timestamp ascending
-      loaded.sort((a, b) => a.timestamp.compareTo(b.timestamp));
       if (!mounted) return;
-
       setState(() => _messages = loaded);
     });
   }
@@ -224,30 +184,37 @@ class _ClassroomScreenState extends State<ClassroomScreen>
       if (!mounted) return;
 
       if (data == null) {
-        setState(() => _participants = []);
+        setState(() {
+          _participants = [];
+          _teacherList = []; // ✅ reassign, not mutate
+        });
         return;
       }
 
       final Map<dynamic, dynamic> map = data as Map<dynamic, dynamic>;
       final List<LiveUser> loaded = map.entries
           .map((e) => LiveUser.fromMap(
-                e.key as String,
-                Map<String, dynamic>.from(e.value as Map),
-              ))
+        e.key as String,
+        Map<String, dynamic>.from(e.value as Map),
+      ))
           .toList();
+
       if (!mounted) return;
 
-      setState(() {
-        _participants = loaded;
+      // ✅ Work on a mutable copy, then reassign state cleanly
+      final mutableList = List<LiveUser>.from(loaded);
+      final teacherIndex = mutableList
+          .indexWhere((user) => user.uid == widget.item.teacherId);
 
-        int index = _participants
-            .indexWhere((user) => user.uid == widget.item.teacherId);
-        if (index != -1) {
-          LiveUser user = _participants[index];
-          _participants.removeAt(index);
-          teacherList.clear();
-          teacherList.add(user);
-        }
+      List<LiveUser> newTeacherList = [];
+      if (teacherIndex != -1) {
+        final teacher = mutableList.removeAt(teacherIndex);
+        newTeacherList = [teacher]; // ✅ new list, not mutated
+      }
+
+      setState(() {
+        _participants = mutableList;
+        _teacherList = newTeacherList; // ✅ reassignment triggers rebuild
       });
     });
   }
@@ -270,11 +237,28 @@ class _ClassroomScreenState extends State<ClassroomScreen>
           'isOnline': isOnline,
         });
       }
-
-      debugPrint('Participant status updated successfully');
     } catch (e) {
       debugPrint('Error updating participant: $e');
       rethrow;
     }
+  }
+
+  void _sendMessage() async {
+    final text = _msgController.text.trim();
+    if (text.isEmpty) return;
+
+    final ChatMessage chatMessage = ChatMessage(
+      senderId: sp?.getStringFromPref(SPKeys.studentId) ?? stringDefault,
+      senderName: sp?.getStringFromPref(SPKeys.name) ?? stringDefault,
+      text: _msgController.text,
+      timestamp: DateTime.now().millisecondsSinceEpoch,
+    );
+
+    await _db
+        .child('live_rooms/${widget.item.startTime}/messages')
+        .push()
+        .set(chatMessage.toMap());
+
+    _msgController.clear();
   }
 }

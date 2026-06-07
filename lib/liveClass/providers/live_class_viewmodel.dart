@@ -1,6 +1,7 @@
 import 'package:b_barna_app/core/constants/value_constants.dart';
 import 'package:b_barna_app/core/widgets/loader_dialog.dart';
 import 'package:b_barna_app/liveClass/models/live_class_model.dart';
+import 'package:b_barna_app/utils/sp_keys.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -13,11 +14,12 @@ class LiveClassViewModel extends ChangeNotifier {
   String? _error;
   bool get isLoading => _isLoading;
   String? get error => _error;
+  String liveClassId = stringDefault;
 
   List<LiveClassModel> get liveClasses => _allClasses.where((c) {
-        final now = DateTime.now().millisecondsSinceEpoch;
-        return c.startTime <= now && now <= c.endTime;
-      }).toList();
+    final now = DateTime.now().millisecondsSinceEpoch;
+    return c.startTime <= now && now <= c.endTime;
+  }).toList();
 
   List<LiveClassModel> get upcomingClasses => _allClasses
       .where((c) => c.startTime > DateTime.now().millisecondsSinceEpoch)
@@ -33,10 +35,15 @@ class LiveClassViewModel extends ChangeNotifier {
   List<LiveUser> users = [];
   String mentionQuery = "";
 
+  void storeLiveClassId(String id) {
+    liveClassId = id;
+  }
+
   Future<void> fetchClasses() async {
     _isLoading = true;
     _error = null;
-    notifyListeners();
+    notifyListeners(); // ✅ direct call, not addPersistentFrameCallback
+
     LoaderDialog.show(navigatorKey.currentContext!);
     try {
       final snapshot = await _firestore.collection('live_classes').get();
@@ -44,12 +51,11 @@ class LiveClassViewModel extends ChangeNotifier {
           .map((doc) => LiveClassModel.fromMap(doc.data(), doc.id))
           .toList();
     } catch (e) {
-      LoaderDialog.hide(navigatorKey.currentContext!);
       _error = 'Failed to load classes. Please try again.';
     } finally {
       LoaderDialog.hide(navigatorKey.currentContext!);
       _isLoading = false;
-      notifyListeners();
+      notifyListeners(); // ✅ direct call
     }
   }
 
@@ -57,10 +63,13 @@ class LiveClassViewModel extends ChangeNotifier {
     db.child("live_rooms/$roomId/participants").onValue.listen((event) {
       final data = event.snapshot.value;
 
-      if (data == null) return;
+      if (data == null) {
+        users = [];
+        notifyListeners(); // ✅ direct call
+        return;
+      }
 
       final map = Map<String, dynamic>.from(data as Map);
-
       users = map.entries.map((e) {
         return LiveUser.fromMap(
           e.key,
@@ -68,7 +77,7 @@ class LiveClassViewModel extends ChangeNotifier {
         );
       }).toList();
 
-      notifyListeners();
+      notifyListeners(); // ✅ direct call — triggers Consumer/Selector rebuilds
     });
   }
 
@@ -79,11 +88,8 @@ class LiveClassViewModel extends ChangeNotifier {
 
   List<LiveUser> get filteredUsers {
     if (mentionQuery.isEmpty) return [];
-
     return users.where((u) {
-      return u.name.toLowerCase().contains(
-            mentionQuery.toLowerCase(),
-          );
+      return u.name.toLowerCase().contains(mentionQuery.toLowerCase());
     }).toList();
   }
 
@@ -94,9 +100,7 @@ class LiveClassViewModel extends ChangeNotifier {
     required String text,
   }) async {
     if (text.trim().isEmpty) return;
-
     final msgRef = db.child("live_rooms/$roomId/messages").push();
-
     await msgRef.set({
       "senderId": senderId,
       "senderName": senderName,
@@ -132,31 +136,43 @@ class LiveClassViewModel extends ChangeNotifier {
   }
 
   String _month(int m) => const [
-        '',
-        'Jan',
-        'Feb',
-        'Mar',
-        'Apr',
-        'May',
-        'Jun',
-        'Jul',
-        'Aug',
-        'Sep',
-        'Oct',
-        'Nov',
-        'Dec'
-      ][m];
+    '', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ][m];
 
- String getButtonStatus(LiveClassModel c,String classStatus){
-   String status="";
-   if(classStatus == "upcoming") {
-     status= formatDateLabel(c);
-   }else
-   if(classStatus == "live") {
-     status= "Join Now";
-   }else if(classStatus == "past") {
-     status="Watch Recording";
- }
-   return status;
- }
+  String getButtonStatus(LiveClassModel c, String classStatus) {
+    if (classStatus == "upcoming") return formatDateLabel(c);
+    if (classStatus == "live") return "Join Now";
+    if (classStatus == "past") return "Watch Recording";
+    return "";
+  }
+
+  Future<void> updateParticipantStatus(
+      String studentId, ParticipantAction action) async {
+    final participantRef = FirebaseDatabase.instance
+        .ref('live_rooms/$liveClassId/participants/$studentId');
+    try {
+      final snapshot = await participantRef.get();
+      if (snapshot.exists) {
+        switch (action) {
+          case ParticipantAction.isBlock:
+            await participantRef.update({'isBlock': true});
+            break;
+          case ParticipantAction.isWarned:
+            await participantRef.update({'isWarned': true});
+            break;
+          case ParticipantAction.isDelete:
+            await participantRef.remove();
+            break;
+        }
+      }
+    } catch (e) {
+      debugPrint('Error updating participant: $e');
+    }
+  }
+
+  bool isBlockedMe(List<LiveUser> liveUserList) {
+    return liveUserList.any((user) =>
+    user.uid == sp?.getStringFromPref(SPKeys.studentId) && user.isBlock);
+  }
 }
