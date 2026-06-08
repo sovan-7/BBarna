@@ -184,6 +184,19 @@ class LiveClassViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> unBlockParticipant(String studentId) async {
+    final participantRef = FirebaseDatabase.instance
+        .ref('live_rooms/$liveClassId/participants/$studentId');
+    try {
+      final snapshot = await participantRef.get();
+      if (snapshot.exists) {
+        await participantRef.update({'isBlock': false});
+      }
+    } catch (e) {
+      debugPrint('Error updating participant: $e');
+    }
+  }
+
   bool isBlockedMe(List<LiveUser> liveUserList) {
     return liveUserList.any((user) =>
         user.uid == sp?.getStringFromPref(SPKeys.studentId) && user.isBlock);

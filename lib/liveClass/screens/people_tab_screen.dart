@@ -333,13 +333,18 @@ class _StudentActionSheet extends StatelessWidget {
               _showConfirmDialog(
                 context: context,
                 title: 'Block ${liveUser.name}?',
-                message:
-                    'This student will be removed from the live class and won\'t be able to rejoin.',
+                message: liveUser.isBlock
+                    ? 'This student can rejoin on the chat section.'
+                    : 'This student will be block on the chat section.',
                 confirmLabel: 'Block',
                 confirmColor: const Color(0xFFFF3B30),
                 onConfirm: () {
-                  livClassVM.updateParticipantStatus(
-                      liveUser.uid, ParticipantAction.isBlock);
+                  if (liveUser.isBlock) {
+                    livClassVM.unBlockParticipant(liveUser.uid);
+                  } else {
+                    livClassVM.updateParticipantStatus(
+                        liveUser.uid, ParticipantAction.isBlock);
+                  }
                 },
               );
             },
