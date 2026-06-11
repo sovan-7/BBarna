@@ -45,7 +45,7 @@ class _ClassroomScreenState extends State<ClassroomScreen>
     super.initState();
 
     String videoId =
-    YoutubePlayer.convertUrlToId(widget.item.youtubeVideoLink)!;
+    getVideoId(widget.item.youtubeVideoLink)!;
     youtubePlayerController = YoutubePlayerController(
       initialVideoId: videoId,
       flags: const YoutubePlayerFlags(
@@ -263,5 +263,16 @@ class _ClassroomScreenState extends State<ClassroomScreen>
         .set(chatMessage.toMap());
 
     _msgController.clear();
+  }
+  String? getVideoId(String? url) {
+    if (url == null || url.isEmpty) return null;
+
+    // ✅ Handle live URL: https://www.youtube.com/live/VIDEO_ID
+    final liveRegex = RegExp(r'youtube\.com/live/([a-zA-Z0-9_-]{11})');
+    final liveMatch = liveRegex.firstMatch(url);
+    if (liveMatch != null) return liveMatch.group(1);
+
+    // ✅ Handle all other formats (watch, youtu.be, shorts, embed)
+    return YoutubePlayer.convertUrlToId(url);
   }
 }
